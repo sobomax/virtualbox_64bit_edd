@@ -451,13 +451,16 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 sectors = buffer[0];
                 /* Build sector number and size from the buffer. */
                 for (j = 1; j < 8; j++) {
+                    uint8_t ch;
+
+                    ch = buffer[j];
                     sectors <<= 8;
-                    sectors |= (uint64_t)(buffer[j]);
+                    sectors |= (uint64_t)ch;
                 }
                 //sectors = swap_64(*(uint64_t *)buffer);
-                DBG_SCSI("%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x\n", __func__,
+                DBG_SCSI("%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x, %8X\n", __func__,
                   buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5],
-                  buffer[6], buffer[7]);
+                  buffer[6], buffer[7], (uint32_t)(sectors & 0xffffffff));
 #if 0
                 sectors = ((uint64_t)buffer[0] << 56) | ((uint64_t)buffer[1] << 48) |
                   ((uint64_t)buffer[2] << 40) | ((uint64_t)buffer[3] << 32) |
