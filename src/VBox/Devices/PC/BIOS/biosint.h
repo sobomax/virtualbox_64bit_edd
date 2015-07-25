@@ -52,7 +52,7 @@
 
 #define DEBUG_ATA       0
 #define DEBUG_AHCI      0
-#define DEBUG_SCSI      0
+#define DEBUG_SCSI      1
 #define DEBUG_CD_BOOT   0
 #define DEBUG_ELTORITO  0
 #define DEBUG_INT13_HD  1
