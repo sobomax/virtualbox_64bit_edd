@@ -456,7 +456,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                     ch = buffer[j];
                     sectors <<= 8;
                     sectors |= (uint64_t)ch;
-                    DBG_SCSI("%d: %8X %2X\n", j, (uint32_t)(sectors), ch);
+                    DBG_SCSI("%d: %8lX %2X\n", j, (uint32_t)(sectors), ch);
                 }
                 //sectors = swap_64(*(uint64_t *)buffer);
                 DBG_SCSI("%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x, %8X\n", __func__,
@@ -557,7 +557,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 else
                     bios_dsk->devices[hd_index].lchs.cylinders = (uint16_t)cylinders;
 
-                BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u 0x%8X%8X sectors\n", devcount_scsi,
+                BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u %lu %lu sectors\n", devcount_scsi,
                         i, (uint16_t)cylinders, heads, sectors_per_track,
                         (uint32_t)(sectors >> 32), (uint32_t)(sectors & 0xffffffff));
 
