@@ -131,15 +131,8 @@ int scsi_cmd_data_in(uint16_t io_base, uint8_t target_id, uint8_t __far *aCDB,
         buffer = (FP_SEG(buffer) + (32768 >> 4)) :> FP_OFF(buffer);
     }
 
-    DBG_SCSI("%s: reading %ld bytes to %X:%X", __func__, length, FP_SEG(buffer), FP_OFF(buffer));
+    DBG_SCSI("%s: reading %ld bytes to %X:%X\n", __func__, length, FP_SEG(buffer), FP_OFF(buffer));
     rep_insb(buffer, length, io_base + VBSCSI_REGISTER_DATA_IN);
-    if (length <= 32) {
-        DBG_SCSI(": data");
-        for (i = 0; i < length; i++) {
-            DBG_SCSI(" %2x", buffer[i]);
-        }
-    }
-    DBG_SCSI("\n");
 
     return 0;
 }
@@ -443,6 +436,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 uint16_t    heads, sectors_per_track;
                 uint8_t     hdcount;
                 uint8_t     cmos_base;
+                int         j;
 
                 /* Issue a read capacity command now. */
                 _fmemset(aCDB, 0, sizeof(aCDB));
@@ -454,15 +448,22 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 if (rc != 0)
                     BX_PANIC("%s: SCSI_READ_CAPACITY failed\n", __func__);
 
+                sectors = buffer[0];
                 /* Build sector number and size from the buffer. */
+                for (j = 1; j < 8; j++) {
+                    sectors <<= 8;
+                    sectors |= (uint64_t)(buffer[j]);
+                }
                 //sectors = swap_64(*(uint64_t *)buffer);
                 DBG_SCSI("%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x\n", __func__,
                   buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5],
                   buffer[6], buffer[7]);
+#if 0
                 sectors = ((uint64_t)buffer[0] << 56) | ((uint64_t)buffer[1] << 48) |
                   ((uint64_t)buffer[2] << 40) | ((uint64_t)buffer[3] << 32) |
                   ((uint64_t)buffer[4] << 24) | ((uint64_t)buffer[5] << 16) |
                   ((uint64_t)buffer[6] << 8)  | ((uint64_t)buffer[7]);
+#endif
 
                 sector_size =   ((uint32_t)buffer[8] << 24)
                               | ((uint32_t)buffer[9] << 16)
