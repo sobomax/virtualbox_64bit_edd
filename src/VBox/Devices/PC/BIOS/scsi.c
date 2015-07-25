@@ -136,7 +136,7 @@ int scsi_cmd_data_in(uint16_t io_base, uint8_t target_id, uint8_t __far *aCDB,
     if (length <= 32) {
         DBG_SCSI(": data");
         for (i = 0; i < length; i++) {
-            DBG_SCSI(" %x", buffer[i]);
+            DBG_SCSI(" %2x", buffer[i]);
         }
     }
     DBG_SCSI("\n");
@@ -456,6 +456,9 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
 
                 /* Build sector number and size from the buffer. */
                 //sectors = swap_64(*(uint64_t *)buffer);
+                DBG_SCSI("%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x\n", __func__,
+                  buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5],
+                  buffer[6], buffer[7]);
                 sectors = ((uint64_t)buffer[0] << 56) | ((uint64_t)buffer[1] << 48) |
                   ((uint64_t)buffer[2] << 40) | ((uint64_t)buffer[3] << 32) |
                   ((uint64_t)buffer[4] << 24) | ((uint64_t)buffer[5] << 16) |
