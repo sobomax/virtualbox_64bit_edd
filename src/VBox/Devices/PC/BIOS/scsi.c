@@ -523,6 +523,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                         /* Approximate x / (255 * 63) using shifts */
                         t = (sectors >> 6) + (sectors >> 12);
                         cylinders = (t >> 8) + (t >> 16);
+                        DBG_SCSI("t = %lX, cylinders = %lX\n", (uint32_t)(t), (uint32_t)(cylinders));
                     }
                     else if (sectors >= (uint32_t)2 * 1024 * 1024)
                     {
@@ -558,7 +559,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 else
                     bios_dsk->devices[hd_index].lchs.cylinders = (uint16_t)cylinders;
 
-                BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u 0x%8lx%8lx sectors\n", devcount_scsi,
+                BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u 0xlx%8lx sectors\n", devcount_scsi,
                         i, (uint16_t)cylinders, heads, sectors_per_track,
                         (uint32_t)(sectors >> 32), (uint32_t)(sectors & 0xffffffff));
 
