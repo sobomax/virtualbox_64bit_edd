@@ -131,8 +131,15 @@ int scsi_cmd_data_in(uint16_t io_base, uint8_t target_id, uint8_t __far *aCDB,
         buffer = (FP_SEG(buffer) + (32768 >> 4)) :> FP_OFF(buffer);
     }
 
-    DBG_SCSI("%s: reading %ld bytes to %X:%X\n", __func__, length, FP_SEG(buffer), FP_OFF(buffer));
+    DBG_SCSI("%s: reading %ld bytes to %X:%X", __func__, length, FP_SEG(buffer), FP_OFF(buffer));
     rep_insb(buffer, length, io_base + VBSCSI_REGISTER_DATA_IN);
+    if (length <= 32) {
+        DBG_SCSI(": data");
+        for (i = 0; i < length; i++) {
+            DBG_SCSI(" %x", buffer[i]);
+        }
+    }
+    DBG_SCSI("\n");
 
     return 0;
 }
