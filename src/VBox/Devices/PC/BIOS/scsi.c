@@ -441,6 +441,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 _fmemset(aCDB, 0, sizeof(aCDB));
                 aCDB[0] = SCSI_SERVICE_ACT;
                 aCDB[1] = SCSI_READ_CAP_16;
+                aCDB[13] = 32; /* Allocation length. */
 
                 rc = scsi_cmd_data_in(io_base, i, aCDB, 16, buffer, 32);
                 if (rc != 0)
