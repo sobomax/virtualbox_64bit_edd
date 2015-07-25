@@ -100,7 +100,7 @@ typedef struct VBOXSCSI
     /** The size of the CDB we are issuing. */
     uint8_t              cbCDB;
     /** The command to issue. */
-    uint8_t              abCDB[VBOXSCSI_CDB_SIZE_MAX + 2];
+    uint8_t              abCDB[VBOXSCSI_CDB_SIZE_MAX + 4];
     /** Current position in the array. */
     uint8_t              iCDB;
 
