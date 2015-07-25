@@ -1034,10 +1034,10 @@ section CONST progbits vstart=0xb0 align=1 ; size=0x10e0 class=DATA group=DGROUP
     db   '%s: SCSI_INQUIRY failed', 00ah, 000h
     db   '%s: Disk detected at %d', 00ah, 000h
     db   '%s: SCSI_READ_CAPACITY failed', 00ah, 000h
-    db   '%d: %8X %2X', 00ah, 000h
+    db   '%d: %8lX %2X', 00ah, 000h
     db   '%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x, %8X', 00ah, 000h
     db   'Disk %d has an unsupported sector size of %u', 00ah, 000h
-    db   'SCSI %d-ID#%d: LCHS=%u/%u/%u 0x%8X%8X sectors', 00ah, 000h
+    db   'SCSI %d-ID#%d: LCHS=%u/%u/%u %lu %lu sectors', 00ah, 000h
     db   'SCSI %d-ID#%d: CD/DVD-ROM', 00ah, 000h
     db   '%s: No supported device detected at %d', 00ah, 000h
     db   'scsi_init: BusLogic SCSI adapter detected', 00ah, 000h
@@ -11938,7 +11938,7 @@ scsi_enumerate_attached_devices_:            ; 0xf7f93 LB 0x586
     movzx ax, byte [bp-0024eh]                ; 0f b6 86 b2 fd
     push ax                                   ; 50
     push 00e07h                               ; 68 07 0e
-    push 00e85h                               ; 68 85 0e
+    push 00e86h                               ; 68 86 0e
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 38 98
     add sp, strict byte 0001ah                ; 83 c4 1a
@@ -11969,7 +11969,7 @@ scsi_enumerate_attached_devices_:            ; 0xf7f93 LB 0x586
     push dx                                   ; 52
     push word [bp-03ah]                       ; ff 76 c6
     push word [bp-022h]                       ; ff 76 de
-    push 00eb5h                               ; 68 b5 0e
+    push 00eb6h                               ; 68 b6 0e
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 e3 97
     add sp, strict byte 0000ah                ; 83 c4 0a
@@ -12154,7 +12154,7 @@ scsi_enumerate_attached_devices_:            ; 0xf7f93 LB 0x586
     push word [bp-022h]                       ; ff 76 de
     movzx ax, byte [bp-00ch]                  ; 0f b6 46 f4
     push ax                                   ; 50
-    push 00ee3h                               ; 68 e3 0e
+    push 00ee4h                               ; 68 e4 0e
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 d5 95
     add sp, strict byte 00016h                ; 83 c4 16
@@ -16923,4 +16923,4 @@ dummy_iret:                                  ; 0xfff53 LB 0x9d
     db  'XM'
 cpu_reset:                                   ; 0xffff0 LB 0x10
     jmp far 0f000h:0e05bh                     ; ea 5b e0 00 f0
-    db  030h, 036h, 02fh, 032h, 033h, 02fh, 039h, 039h, 000h, 0fch, 012h
+    db  030h, 036h, 02fh, 032h, 033h, 02fh, 039h, 039h, 000h, 0fch, 089h
