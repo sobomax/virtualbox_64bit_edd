@@ -48,11 +48,12 @@
 #define VBSCSI_MAX_DEVICES 16 /* Maximum number of devices a SCSI device can have. */
 
 /* Command opcodes. */
+#define SCSI_SERVICE_ACT   0x9e
 #define SCSI_INQUIRY       0x12
 #define SCSI_READ_CAP_10   0x25
 #define SCSI_READ_10       0x28
 #define SCSI_WRITE_10      0x2a
-#define SCSI_READ_CAP_16   0x9e
+#define SCSI_READ_CAP_16   0x10    /* Not an opcode by itself, sub-action for the "Service Action" */
 #define SCSI_READ_16       0x88
 #define SCSI_WRITE_16      0x8a
 
@@ -438,7 +439,8 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
 
                 /* Issue a read capacity command now. */
                 _fmemset(aCDB, 0, sizeof(aCDB));
-                aCDB[0] = SCSI_READ_CAP_16;
+                aCDB[0] = SCSI_SERVICE_ACT;
+                aCDB[1] = SCSI_READ_CAP_16;
 
                 rc = scsi_cmd_data_in(io_base, i, aCDB, 16, buffer, 32);
                 if (rc != 0)
