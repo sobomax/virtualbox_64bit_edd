@@ -447,7 +447,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 rc = scsi_cmd_data_in(io_base, i, aCDB, 16, buffer, 32);
                 if (rc != 0)
                     BX_PANIC("%s: SCSI_READ_CAPACITY failed\n", __func__);
-
+#if 0
                 sectors = buffer[0];
                 /* Build sector number and size from the buffer. */
                 for (j = 1; j < 8; j++) {
@@ -458,7 +458,8 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                     sectors |= (uint64_t)ch;
                     DBG_SCSI("%d: %8lX %2X\n", j, (uint32_t)(sectors), ch);
                 }
-                //sectors = swap_64(*(uint64_t *)buffer);
+#endif
+                sectors = swap_64(*(uint64_t *)buffer) + 1;
                 DBG_SCSI("%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x, %8X\n", __func__,
                   buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5],
                   buffer[6], buffer[7], (uint32_t)(sectors & 0xffffffff));
