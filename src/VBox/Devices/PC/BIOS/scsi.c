@@ -52,6 +52,8 @@
 #define SCSI_READ_CAPACITY 0x25
 #define SCSI_READ_10       0x28
 #define SCSI_WRITE_10      0x2a
+#define SCSI_READ_16       0x88
+#define SCSI_WRITE_16      0x8a
 
 /* Data transfer direction. */
 #define SCSI_TXDIR_FROM_DEVICE 0
@@ -68,10 +70,19 @@ typedef struct {
     uint8_t     pad2;       /* Unused. */
 } cdb_rw10;
 
+/* READ_16/WRITE_16 CDB layout. */
+typedef struct {
+    uint16_t    command;    /* Command. */
+    uint64_t    lba64;      /* LBA, MSB first! */
+    uint32_t    nsect32;    /* Sector count, MSB first! */
+    uint8_t     pad1;       /* Unused. */
+    uint8_t     pad2;       /* Unused. */
+} cdb_rw16;
+
 #pragma pack()
 
 ct_assert(sizeof(cdb_rw10) == 10);
-
+ct_assert(sizeof(cdb_rw16) == 16);
 
 void insb_discard(unsigned nbytes, unsigned port);
 #pragma aux insb_discard =  \
@@ -166,6 +177,17 @@ int scsi_cmd_data_out(uint16_t io_base, uint8_t target_id, uint8_t __far *aCDB,
     return 0;
 }
 
+static inline uint64_t swap_64(uint64_t val)
+{
+    uint64_t rval;
+
+    rval = swap_32(val & 0xffffffff);
+    rval <<= 32;
+    rval |= swap_32(val >> 32);
+
+    return rval;
+}
+
 /**
  * Read sectors from an attached SCSI device.
  *
@@ -176,8 +198,8 @@ int scsi_cmd_data_out(uint16_t io_base, uint8_t target_id, uint8_t __far *aCDB,
 int scsi_read_sectors(bio_dsk_t __far *bios_dsk)
 {
     uint8_t             rc;
-    cdb_rw10            cdb;
-    uint16_t            count;
+    cdb_rw16            cdb;
+    uint32_t            count;
     uint16_t            io_base;
     uint8_t             target_id;
     uint8_t             device_id;
@@ -189,10 +211,10 @@ int scsi_read_sectors(bio_dsk_t __far *bios_dsk)
     count    = bios_dsk->drqp.nsect;
 
     /* Prepare a CDB. */
-    cdb.command = SCSI_READ_10;
-    cdb.lba     = swap_32(bios_dsk->drqp.lba);
+    cdb.command = SCSI_READ_16;
+    cdb.lba64   = swap_64(bios_dsk->drqp.lba64);
     cdb.pad1    = 0;
-    cdb.nsect   = swap_16(count);
+    cdb.nsect32 = swap_32(count);
     cdb.pad2    = 0;
 
 
@@ -202,7 +224,7 @@ int scsi_read_sectors(bio_dsk_t __far *bios_dsk)
     DBG_SCSI("%s: reading %u sectors, device %d, target %d\n", __func__,
              count, device_id, bios_dsk->scsidev[device_id].target_id);
 
-    rc = scsi_cmd_data_in(io_base, target_id, (void __far *)&cdb, 10,
+    rc = scsi_cmd_data_in(io_base, target_id, (void __far *)&cdb, 16,
                           bios_dsk->drqp.buffer, (count * 512L));
 
     if (!rc)
@@ -225,8 +247,8 @@ int scsi_read_sectors(bio_dsk_t __far *bios_dsk)
 int scsi_write_sectors(bio_dsk_t __far *bios_dsk)
 {
     uint8_t             rc;
-    cdb_rw10            cdb;
-    uint16_t            count;
+    cdb_rw16            cdb;
+    uint32_t            count;
     uint16_t            io_base;
     uint8_t             target_id;
     uint8_t             device_id;
@@ -238,10 +260,10 @@ int scsi_write_sectors(bio_dsk_t __far *bios_dsk)
     count    = bios_dsk->drqp.nsect;
 
     /* Prepare a CDB. */
-    cdb.command = SCSI_WRITE_10;
-    cdb.lba     = swap_32(bios_dsk->drqp.lba);
+    cdb.command = SCSI_WRITE_16;
+    cdb.lba64   = swap_64(bios_dsk->drqp.lba64);
     cdb.pad1    = 0;
-    cdb.nsect   = swap_16(count);
+    cdb.nsect32 = swap_32(count);
     cdb.pad2    = 0;
 
     io_base   = bios_dsk->scsidev[device_id].io_base;
@@ -250,7 +272,7 @@ int scsi_write_sectors(bio_dsk_t __far *bios_dsk)
     DBG_SCSI("%s: writing %u sectors, device %d, target %d\n", __func__,
              count, device_id, bios_dsk->scsidev[device_id].target_id);
 
-    rc = scsi_cmd_data_out(io_base, target_id, (void __far *)&cdb, 10,
+    rc = scsi_cmd_data_out(io_base, target_id, (void __far *)&cdb, 16,
                            bios_dsk->drqp.buffer, (count * 512L));
 
     if (!rc)
@@ -522,7 +544,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 else
                     bios_dsk->devices[hd_index].pchs.cylinders = (uint16_t)cylinders;
 
-                bios_dsk->devices[hd_index].sectors = sectors;
+                bios_dsk->devices[hd_index].sectors64 = sectors;
 
                 /* Store the id of the disk in the ata hdidmap. */
                 hdcount = bios_dsk->hdcount;

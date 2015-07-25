@@ -214,7 +214,7 @@ void BIOSCALL int13_harddisk(disk_regs_t r)
         bios_dsk->drqp.trsfbytes   = 0;
 
         /* Pass request information to low level disk code. */
-        bios_dsk->drqp.lba      = lba;
+        bios_dsk->drqp.lba64    = lba;
         bios_dsk->drqp.buffer   = MK_FP(ES, BX);
         bios_dsk->drqp.nsect    = count;
         bios_dsk->drqp.sect_sz  = 512;  //@todo: device specific?
@@ -330,7 +330,7 @@ int13_success_noah:
 
 void BIOSCALL int13_harddisk_ext(disk_regs_t r)
 {
-    uint32_t            lba;
+    uint64_t            lba;
     uint16_t            ebda_seg = read_word(0x0040,0x000E);
     uint16_t            segment, offset;
     uint16_t            npc, nph, npspt;
@@ -383,21 +383,16 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
         segment = i13_ext->segment;
         offset  = i13_ext->offset;
 
-        BX_DEBUG_INT13_HD("%s: %d sectors from lba %lu @ %04x:%04x\n", __func__,
-                          count, i13_ext->lba1, segment, offset);
+        BX_DEBUG_INT13_HD("%s: %d sectors from lba1 %lu lba2 %lu @ %04x:%04x\n", __func__,
+                          count, i13_ext->lba1, i13_ext->lba2, segment, offset);
 
-        // Can't use 64 bits lba
-        lba = i13_ext->lba2;
-        if (lba != 0L) {
-            BX_PANIC("%s: function %02x. Can't use 64bits lba\n", __func__, GET_AH());
-            goto int13x_fail;
-        }
-
-        // Get 32 bits lba and check
+        // Get 64 bits lba and check
         lba = i13_ext->lba1;
+        lba <<= 32;
+        lba |= i13_ext->lba2;
 
         type = bios_dsk->devices[device].type;
-        if (lba >= bios_dsk->devices[device].sectors) {
+        if (lba >= bios_dsk->devices[device].sectors64) {
               BX_INFO("%s: function %02x. LBA out of range\n", __func__, GET_AH());
               goto int13x_fail;
         }
@@ -411,7 +406,7 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
         bios_dsk->drqp.trsfbytes   = 0;
 
         /* Pass request information to low level disk code. */
-        bios_dsk->drqp.lba     = lba;
+        bios_dsk->drqp.lba64   = lba;
         bios_dsk->drqp.buffer  = MK_FP(segment, offset);
         bios_dsk->drqp.nsect   = count;
         bios_dsk->drqp.sect_sz = 512;   //@todo: device specific?
@@ -457,7 +452,7 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
             npc     = bios_dsk->devices[device].pchs.cylinders;
             nph     = bios_dsk->devices[device].pchs.heads;
             npspt   = bios_dsk->devices[device].pchs.spt;
-            lba     = bios_dsk->devices[device].sectors;
+            lba     = bios_dsk->devices[device].sectors64;
             blksize = bios_dsk->devices[device].blksize;
 
             dpt->size      = 0x1a;
@@ -466,8 +461,8 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
             dpt->heads     = nph;
             dpt->spt       = npspt;
             dpt->blksize   = blksize;
-            dpt->sector_count1 = lba;   // FIXME should be Bit64
-            dpt->sector_count2 = 0;
+            dpt->sector_count1 = lba;
+            dpt->sector_count2 = lba >> 32;
         }
 
         /* Fill in EDD 2.x table. */
