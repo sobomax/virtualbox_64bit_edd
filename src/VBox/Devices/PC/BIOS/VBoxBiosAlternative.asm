@@ -8193,16 +8193,16 @@ _int13_harddisk_ext:                         ; 0xf5a03 LB 0x534
     call 01922h                               ; e8 04 be
     add sp, strict byte 00014h                ; 83 c4 14
     mov es, [bp-02ah]                         ; 8e 46 d6
-    mov dx, word [es:di+008h]                 ; 26 8b 55 08
-    mov cx, word [es:di+00ah]                 ; 26 8b 4d 0a
+    mov dx, word [es:di+00ch]                 ; 26 8b 55 0c
+    mov cx, word [es:di+00eh]                 ; 26 8b 4d 0e
     xor ax, ax                                ; 31 c0
     xor bx, bx                                ; 31 db
     mov si, strict word 00020h                ; be 20 00
     call 09c40h                               ; e8 0a 41
     mov word [bp-010h], ax                    ; 89 46 f0
     mov si, bx                                ; 89 de
-    mov ax, word [es:di+00ch]                 ; 26 8b 45 0c
-    mov bx, word [es:di+00eh]                 ; 26 8b 5d 0e
+    mov ax, word [es:di+008h]                 ; 26 8b 45 08
+    mov bx, word [es:di+00ah]                 ; 26 8b 5d 0a
     or dx, ax                                 ; 09 c2
     or cx, bx                                 ; 09 d9
     movzx ax, byte [bp-006h]                  ; 0f b6 46 fa
