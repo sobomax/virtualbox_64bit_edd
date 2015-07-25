@@ -447,7 +447,11 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                     BX_PANIC("%s: SCSI_READ_CAPACITY failed\n", __func__);
 
                 /* Build sector number and size from the buffer. */
-                sectors = swap_64(*(uint64_t *)buffer);
+                //sectors = swap_64(*(uint64_t *)buffer);
+                sectors = ((uint64_t)buffer[0] << 56) | ((uint64_t)buffer[1] << 48) |
+                  ((uint64_t)buffer[2] << 40) | ((uint64_t)buffer[3] << 32) |
+                  ((uint64_t)buffer[4] << 24) | ((uint64_t)buffer[5] << 16) |
+                  ((uint64_t)buffer[6] << 8)  | ((uint64_t)buffer[7]);
 
                 sector_size =   ((uint32_t)buffer[8] << 24)
                               | ((uint32_t)buffer[9] << 16)
