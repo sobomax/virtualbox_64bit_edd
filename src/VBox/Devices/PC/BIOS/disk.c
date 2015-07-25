@@ -387,9 +387,9 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
                           count, i13_ext->lba1, i13_ext->lba2, segment, offset);
 
         // Get 64 bits lba and check
-        lba = i13_ext->lba1;
+        lba = i13_ext->lba2;
         lba <<= 32;
-        lba |= i13_ext->lba2;
+        lba |= i13_ext->lba1;
 
         type = bios_dsk->devices[device].type;
         if (lba >= bios_dsk->devices[device].sectors64) {
