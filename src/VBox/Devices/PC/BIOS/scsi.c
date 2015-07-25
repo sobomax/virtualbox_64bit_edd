@@ -49,9 +49,10 @@
 
 /* Command opcodes. */
 #define SCSI_INQUIRY       0x12
-#define SCSI_READ_CAPACITY 0x25
+#define SCSI_READ_CAP_10   0x25
 #define SCSI_READ_10       0x28
 #define SCSI_WRITE_10      0x2a
+#define SCSI_READ_CAP_16   0x9e
 #define SCSI_READ_16       0x88
 #define SCSI_WRITE_16      0x8a
 
@@ -406,7 +407,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
     for (i = 0; i < VBSCSI_MAX_DEVICES; i++)
     {
         uint8_t     rc;
-        uint8_t     aCDB[10];
+        uint8_t     aCDB[16];
         uint8_t     hd_index, devcount_scsi;
 
         aCDB[0] = SCSI_INQUIRY;
@@ -429,30 +430,27 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
             /* We add the disk only if the maximum is not reached yet. */
             if (bios_dsk->scsi_devcount < BX_MAX_SCSI_DEVICES)
             {
-                uint32_t    sectors, sector_size, cylinders;
+                uint64_t    sectors, t;
+                uint32_t    sector_size, cylinders;
                 uint16_t    heads, sectors_per_track;
                 uint8_t     hdcount;
                 uint8_t     cmos_base;
 
                 /* Issue a read capacity command now. */
                 _fmemset(aCDB, 0, sizeof(aCDB));
-                aCDB[0] = SCSI_READ_CAPACITY;
+                aCDB[0] = SCSI_READ_CAP_16;
 
-                rc = scsi_cmd_data_in(io_base, i, aCDB, 10, buffer, 8);
+                rc = scsi_cmd_data_in(io_base, i, aCDB, 16, buffer, 32);
                 if (rc != 0)
                     BX_PANIC("%s: SCSI_READ_CAPACITY failed\n", __func__);
 
                 /* Build sector number and size from the buffer. */
-                //@todo: byte swapping for dword sized items should be farmed out...
-                sectors =   ((uint32_t)buffer[0] << 24)
-                          | ((uint32_t)buffer[1] << 16)
-                          | ((uint32_t)buffer[2] << 8)
-                          | ((uint32_t)buffer[3]);
+                sectors = swap_64(*(uint64_t *)buffer);
 
-                sector_size =   ((uint32_t)buffer[4] << 24)
-                              | ((uint32_t)buffer[5] << 16)
-                              | ((uint32_t)buffer[6] << 8)
-                              | ((uint32_t)buffer[7]);
+                sector_size =   ((uint32_t)buffer[8] << 24)
+                              | ((uint32_t)buffer[9] << 16)
+                              | ((uint32_t)buffer[10] << 8)
+                              | ((uint32_t)buffer[11]);
 
                 /* We only support the disk if sector size is 512 bytes. */
                 if (sector_size != 512)
@@ -499,18 +497,22 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                     {
                         heads = 255;
                         sectors_per_track = 63;
+                        /* Approximate x / (255 * 63) using shifts */
+                        t = (sectors >> 6) + (sectors >> 12);
+                        cylinders = (t >> 8) + (t >> 16);
                     }
                     else if (sectors >= (uint32_t)2 * 1024 * 1024)
                     {
                         heads = 128;
                         sectors_per_track = 32;
+                        cylinders = sectors >> 12;
                     }
                     else
                     {
                         heads = 64;
                         sectors_per_track = 32;
+                        cylinders = sectors >> 11;
                     }
-                    cylinders = (uint32_t)(sectors / (heads * sectors_per_track));
                 }
 
                 /* Calculate index into the generic disk table. */
@@ -533,7 +535,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 else
                     bios_dsk->devices[hd_index].lchs.cylinders = (uint16_t)cylinders;
 
-                BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u %lu sectors\n", devcount_scsi,
+                BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u %llu sectors\n", devcount_scsi,
                         i, (uint16_t)cylinders, heads, sectors_per_track, sectors);
 
                 /* Write PCHS values. */
