@@ -383,8 +383,8 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
         segment = i13_ext->segment;
         offset  = i13_ext->offset;
 
-        BX_DEBUG_INT13_HD("%s: %d sectors from lba1 %lu lba2 %lu @ %04x:%04x\n", __func__,
-                          count, i13_ext->lba1, i13_ext->lba2, segment, offset);
+        BX_DEBUG_INT13_HD("%s: %d sectors from LBA 0x%lx%8lx @ %04x:%04x\n", __func__,
+                          count, i13_ext->lba2, i13_ext->lba1, segment, offset);
 
         // Get 64 bits lba and check
         lba = i13_ext->lba2;
