@@ -543,7 +543,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                     bios_dsk->devices[hd_index].pchs.cylinders = (uint16_t)cylinders;
                 }
 
-                BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u 0x%lx%8lx sectors\n", devcount_scsi,
+                BX_INFO("SCSI %d-ID#%d: LCHS=%lu/%u/%u 0x%lx%8lx sectors\n", devcount_scsi,
                         i, (uint32_t)cylinders, heads, sectors_per_track,
                         (uint32_t)(sectors >> 32), (uint32_t)(sectors & 0xffffffff));
 
