@@ -436,7 +436,6 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 uint16_t    heads, sectors_per_track;
                 uint8_t     hdcount;
                 uint8_t     cmos_base;
-                int         j;
 
                 /* Issue a read capacity command now. */
                 _fmemset(aCDB, 0, sizeof(aCDB));
@@ -447,28 +446,8 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 rc = scsi_cmd_data_in(io_base, i, aCDB, 16, buffer, 32);
                 if (rc != 0)
                     BX_PANIC("%s: SCSI_READ_CAPACITY failed\n", __func__);
-#if 0
-                sectors = buffer[0];
-                /* Build sector number and size from the buffer. */
-                for (j = 1; j < 8; j++) {
-                    uint8_t ch;
 
-                    ch = buffer[j];
-                    sectors <<= 8;
-                    sectors |= (uint64_t)ch;
-                    DBG_SCSI("%d: %8lX %2X\n", j, (uint32_t)(sectors), ch);
-                }
-#endif
                 sectors = swap_64(*(uint64_t *)buffer) + 1;
-                DBG_SCSI("%s: got length 0x%2x%2x%2x%2x%2x%2x%2x%2x, %8X\n", __func__,
-                  buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5],
-                  buffer[6], buffer[7], (uint32_t)(sectors & 0xffffffff));
-#if 0
-                sectors = ((uint64_t)buffer[0] << 56) | ((uint64_t)buffer[1] << 48) |
-                  ((uint64_t)buffer[2] << 40) | ((uint64_t)buffer[3] << 32) |
-                  ((uint64_t)buffer[4] << 24) | ((uint64_t)buffer[5] << 16) |
-                  ((uint64_t)buffer[6] << 8)  | ((uint64_t)buffer[7]);
-#endif
 
                 sector_size =   ((uint32_t)buffer[8] << 24)
                               | ((uint32_t)buffer[9] << 16)
@@ -550,25 +529,23 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 bios_dsk->devices[hd_index].blksize     = sector_size;
                 bios_dsk->devices[hd_index].translation = GEO_TRANSLATION_LBA;
 
-                /* Write LCHS values. */
+                /* Write LCHS/PCHS values. */
                 bios_dsk->devices[hd_index].lchs.heads = heads;
                 bios_dsk->devices[hd_index].lchs.spt   = sectors_per_track;
-                if (cylinders > 1024)
+                bios_dsk->devices[hd_index].pchs.heads = heads;
+                bios_dsk->devices[hd_index].pchs.spt   = sectors_per_track;
+
+                if (cylinders > 1024) {
                     bios_dsk->devices[hd_index].lchs.cylinders = 1024;
-                else
+                    bios_dsk->devices[hd_index].pchs.cylinders = 1024;
+                } else {
                     bios_dsk->devices[hd_index].lchs.cylinders = (uint16_t)cylinders;
+                    bios_dsk->devices[hd_index].pchs.cylinders = (uint16_t)cylinders;
+                }
 
                 BX_INFO("SCSI %d-ID#%d: LCHS=%u/%u/%u 0x%lx%8lx sectors\n", devcount_scsi,
                         i, (uint32_t)cylinders, heads, sectors_per_track,
                         (uint32_t)(sectors >> 32), (uint32_t)(sectors & 0xffffffff));
-
-                /* Write PCHS values. */
-                bios_dsk->devices[hd_index].pchs.heads = heads;
-                bios_dsk->devices[hd_index].pchs.spt   = sectors_per_track;
-                if (cylinders > 1024)
-                    bios_dsk->devices[hd_index].pchs.cylinders = 1024;
-                else
-                    bios_dsk->devices[hd_index].pchs.cylinders = (uint16_t)cylinders;
 
                 bios_dsk->devices[hd_index].sectors64 = sectors;
 
