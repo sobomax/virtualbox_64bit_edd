@@ -459,7 +459,7 @@ void BIOSCALL ata_detect(void)
 
         // Now we send a IDENTIFY command to ATA device
         if (type == DSK_TYPE_ATA) {
-            uint32_t    sectors;
+            uint64_t    sectors;
             uint16_t    cylinders, heads, spt, blksize;
             chs_t       lgeo;
             uint8_t     chsgeo_base;
@@ -483,9 +483,8 @@ void BIOSCALL ata_detect(void)
             spt       = *(uint16_t *)(buffer+(6*2)); // word 6
 
             sectors   = *(uint32_t *)(buffer+(60*2)); // word 60 and word 61
-            /** @todo update sectors to be a 64 bit number (also lba...). */
             if (sectors == 0x0FFFFFFF)  /* For disks bigger than ~128GB */
-                sectors = *(uint32_t *)(buffer+(100*2)); // words 100 to 103 (someday)
+                sectors = *(uint64_t *)(buffer+(100*2)); // words 100 to 103
             switch (device)
             {
             case 0:
