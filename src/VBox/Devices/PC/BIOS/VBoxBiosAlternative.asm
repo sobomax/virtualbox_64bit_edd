@@ -1035,7 +1035,7 @@ section CONST progbits vstart=0xb0 align=1 ; size=0x10a0 class=DATA group=DGROUP
     db   '%s: Disk detected at %d', 00ah, 000h
     db   '%s: SCSI_READ_CAPACITY failed', 00ah, 000h
     db   'Disk %d has an unsupported sector size of %u', 00ah, 000h
-    db   'SCSI %d-ID#%d: LCHS=%u/%u/%u 0x%lx%8lx sectors', 00ah, 000h
+    db   'SCSI %d-ID#%d: LCHS=%lu/%u/%u 0x%lx%8lx sectors', 00ah, 000h
     db   'SCSI %d-ID#%d: CD/DVD-ROM', 00ah, 000h
     db   '%s: No supported device detected at %d', 00ah, 000h
     db   'scsi_init: BusLogic SCSI adapter detected', 00ah, 000h
@@ -1043,7 +1043,7 @@ section CONST progbits vstart=0xb0 align=1 ; size=0x10a0 class=DATA group=DGROUP
     db   'scsi_init: LSI Logic SCSI adapter detected', 00ah, 000h
     db   'scsi_init: LSI Logic SCSI adapter not detected', 00ah, 000h
     db   'scsi_init: LSI Logic SAS adapter detected', 00ah, 000h
-    db   'scsi_init: LSI Logic SAS adapter not detected', 00ah, 000h, 000h
+    db   'scsi_init: LSI Logic SAS adapter not detected', 00ah, 000h
     db   'ahci_read_sectors', 000h
     db   '%s: device_id out of range %d', 00ah, 000h
     db   'ahci_write_sectors', 000h
@@ -12188,7 +12188,7 @@ scsi_enumerate_attached_devices_:            ; 0xf7f93 LB 0x52d
     push word [bp-030h]                       ; ff 76 d0
     movzx ax, byte [bp-00ch]                  ; 0f b6 46 f4
     push ax                                   ; 50
-    push 00ed2h                               ; 68 d2 0e
+    push 00ed3h                               ; 68 d3 0e
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 6e 95
     add sp, strict byte 00008h                ; 83 c4 08
@@ -12233,7 +12233,7 @@ scsi_enumerate_attached_devices_:            ; 0xf7f93 LB 0x52d
     call 018e1h                               ; e8 ae 94
     push word [bp-030h]                       ; ff 76 d0
     push 00e03h                               ; 68 03 0e
-    push 00eedh                               ; 68 ed 0e
+    push 00eeeh                               ; 68 ee 0e
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 e1 94
     add sp, strict byte 00008h                ; 83 c4 08
@@ -12304,7 +12304,7 @@ _scsi_init:                                  ; 0xf84c0 LB 0xf0
     mov cx, ds                                ; 8c d9
     mov ax, strict word 00004h                ; b8 04 00
     call 018e1h                               ; e8 f2 93
-    push 00f15h                               ; 68 15 0f
+    push 00f16h                               ; 68 16 0f
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 2b 94
     add sp, strict byte 00004h                ; 83 c4 04
@@ -12318,7 +12318,7 @@ _scsi_init:                                  ; 0xf84c0 LB 0xf0
     mov cx, ds                                ; 8c d9
     mov ax, strict word 00004h                ; b8 04 00
     call 018e1h                               ; e8 ce 93
-    push 00f40h                               ; 68 40 0f
+    push 00f41h                               ; 68 41 0f
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 07 94
     add sp, strict byte 00004h                ; 83 c4 04
@@ -12334,7 +12334,7 @@ _scsi_init:                                  ; 0xf84c0 LB 0xf0
     mov cx, ds                                ; 8c d9
     mov ax, strict word 00004h                ; b8 04 00
     call 018e1h                               ; e8 ab 93
-    push 00f6fh                               ; 68 6f 0f
+    push 00f70h                               ; 68 70 0f
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 e4 93
     add sp, strict byte 00004h                ; 83 c4 04
@@ -12348,7 +12348,7 @@ _scsi_init:                                  ; 0xf84c0 LB 0xf0
     mov cx, ds                                ; 8c d9
     mov ax, strict word 00004h                ; b8 04 00
     call 018e1h                               ; e8 87 93
-    push 00f9bh                               ; 68 9b 0f
+    push 00f9ch                               ; 68 9c 0f
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 c0 93
     add sp, strict byte 00004h                ; 83 c4 04
@@ -12364,7 +12364,7 @@ _scsi_init:                                  ; 0xf84c0 LB 0xf0
     mov cx, ds                                ; 8c d9
     mov ax, strict word 00004h                ; b8 04 00
     call 018e1h                               ; e8 64 93
-    push 00fcbh                               ; 68 cb 0f
+    push 00fcch                               ; 68 cc 0f
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 9d 93
     add sp, strict byte 00004h                ; 83 c4 04
@@ -12378,7 +12378,7 @@ _scsi_init:                                  ; 0xf84c0 LB 0xf0
     mov cx, ds                                ; 8c d9
     mov ax, strict word 00004h                ; b8 04 00
     call 018e1h                               ; e8 40 93
-    push 00ff6h                               ; 68 f6 0f
+    push 00ff7h                               ; 68 f7 0f
     push strict byte 00004h                   ; 6a 04
     call 01922h                               ; e8 79 93
     add sp, strict byte 00004h                ; 83 c4 04
@@ -16880,4 +16880,4 @@ dummy_iret:                                  ; 0xfff53 LB 0x9d
     db  'XM'
 cpu_reset:                                   ; 0xffff0 LB 0x10
     jmp far 0f000h:0e05bh                     ; ea 5b e0 00 f0
-    db  030h, 036h, 02fh, 032h, 033h, 02fh, 039h, 039h, 000h, 0fch, 04ch
+    db  030h, 036h, 02fh, 032h, 033h, 02fh, 039h, 039h, 000h, 0fch, 0d8h
