@@ -98,12 +98,14 @@ dsk_acc_t   dskacc[DSKTYP_CNT] = {
  * Phoenix EDD 3.0. This is used as a fallback to generate sane logical
  * geometry in case none was provided in CMOS.
  */
-void set_geom_lba(chs_t __far *lgeo, uint32_t nsectors)
+void set_geom_lba(chs_t __far *lgeo, uint64_t nsectors64)
 {
     uint32_t    limit = 8257536;    /* 1024 * 128 * 63 */
+    uint32_t    nsectors;
     unsigned    heads = 255;
     int         i;
 
+    nsectors = (nsectors64 >> 32) ? 0xFFFFFFFFL : (uint32_t)nsectors64;
     /* Start with ~4GB limit, go down to 504MB. */
     for (i = 0; i < 4; ++i) {
         if (nsectors <= limit)
