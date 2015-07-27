@@ -189,6 +189,30 @@ void bios_printf(uint16_t action, const char *s, ...)
                 else if (c == 'u') {
                     put_uint(action, arg, format_width, 0);
                 }
+                else if (c == 'l' && s[1] == 'l') {
+                    uint16_t *cp16;
+                    uint8_t cp8[8];
+
+                    s += 2;
+                    c = *s;
+                    cp16 = (uint16_t *)cp8;
+                    cp16[0] = va_arg( args, uint16_t );
+                    cp16[1] = va_arg( args, uint16_t );
+                    cp16[2] = va_arg( args, uint16_t );
+                    cp16[3] = va_arg( args, uint16_t );
+                    if (c == 'x' || c == 'X') {
+                        if (format_width == 0)
+                            format_width = 16;
+                        if (c == 'x')
+                            hexadd = 'a';
+                        else
+                            hexadd = 'A';
+                        for (i=format_width-1; i>=0; i--) {
+                            nibble = cp8[i];
+                            send (action, (nibble<=9)? (nibble+'0') : (nibble-10+hexadd));
+                        }
+                    }
+                }
                 else if (c == 'l') {
                     s++;
                     c = *s; /* is it ld,lx,lu? */
