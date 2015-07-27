@@ -47,10 +47,8 @@
 #include "ata.h"
 
 #if DEBUG_ATA
-#  define BX_DEBUG_ATAR(...) BX_DEBUG(__VA_ARGS__)
-#  define BX_DEBUG_ATA(...)
+#  define BX_DEBUG_ATA(...) BX_DEBUG(__VA_ARGS__)
 #else
-#  define BX_DEBUG_ATAR(...)
 #  define BX_DEBUG_ATA(...)
 #endif
 
@@ -836,17 +834,17 @@ int ata_read_sectors(bio_dsk_t __far *bios_dsk)
     if (bios_dsk->drqp.sector) {
         /* CHS addressing. */
         bios_dsk->devices[device_id].blksize = n_sect * 0x200;
-        BX_DEBUG_ATAR("%s: reading %u sectors (CHS)\n", __func__, n_sect);
+        BX_DEBUG_ATA("%s: reading %u sectors (CHS)\n", __func__, n_sect);
         status = ata_cmd_data_in(bios_dsk, ATA_CMD_READ_MULTIPLE, n_sect);
         bios_dsk->devices[device_id].blksize = 0x200;
     } else {
         /* LBA addressing. */
         if (bios_dsk->drqp.lba64 + n_sect >= 268435456) {
-            BX_DEBUG_ATAR("%s: reading %u sector (LBA,EXT)\n", __func__, n_sect);
+            BX_DEBUG_ATA("%s: reading %u sector (LBA,EXT)\n", __func__, n_sect);
             status = ata_cmd_data_in(bios_dsk, ATA_CMD_READ_SECTORS_EXT, n_sect);
         } else {
             bios_dsk->devices[device_id].blksize = n_sect * 0x200;
-            BX_DEBUG_ATAR("%s: reading %u sector (LBA,MULT)\n", __func__, n_sect);
+            BX_DEBUG_ATA("%s: reading %u sector (LBA,MULT)\n", __func__, n_sect);
             status = ata_cmd_data_in(bios_dsk, ATA_CMD_READ_MULTIPLE, n_sect);
             bios_dsk->devices[device_id].blksize = 0x200;
         }
