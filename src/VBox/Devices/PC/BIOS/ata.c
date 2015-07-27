@@ -257,8 +257,8 @@ uint16_t ata_cmd_data_in(bio_dsk_t __far *bios_dsk, uint16_t command, uint16_t c
     if (sector == 0) {
         if (lba + count >= 268435456)
         {
-            sector = (lba >> 24) & 0xffff;
-            cylinder = (lba >> 40) & 0xffff;
+            sector = (lba >> 24) & 0x00ff;
+            cylinder = (lba >> 32) & 0xffff;
             outb(iobase1 + ATA_CB_SC, (count & 0xff00) >> 8);
             outb(iobase1 + ATA_CB_SN, sector);
             outb(iobase1 + ATA_CB_CL, cylinder & 0x00ff);
