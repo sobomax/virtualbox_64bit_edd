@@ -447,6 +447,9 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 if (rc != 0)
                     BX_PANIC("%s: SCSI_READ_CAPACITY failed\n", __func__);
 
+                /* The value returned is the last addressable LBA, not
+                 * the size, which what "+ 1" is for.
+                 */
                 sectors = swap_64(*(uint64_t *)buffer) + 1;
 
                 sector_size =   ((uint32_t)buffer[8] << 24)
