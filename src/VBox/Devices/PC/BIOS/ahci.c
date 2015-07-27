@@ -32,8 +32,6 @@
 /* Number of S/G table entries in EDDS. */
 #define NUM_EDDS_SG         16
 
-#define	U64_PRINT(val)      (uint32_t)(val >> 32), (uint32_t)(val)
-
 /**
  * AHCI PRDT structure.
  */
@@ -662,7 +660,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
             VBOXAHCI_PORT_READ_REG(ahci->iobase, u8Port, AHCI_REG_PORT_SIG, val);
             if (val == 0x101)
             {
-                uint64_t    sectors;
+                uint64_t    sectors, ttt;
                 uint16_t    cylinders, heads, spt;
                 chs_t       lgeo;
                 uint8_t     idxCmosChsBase;
@@ -731,9 +729,10 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 else
                     set_geom_lba(&lgeo, sectors);   /* Default EDD-style translated LBA geometry. */
 
-                BX_INFO("AHCI %d-P#%d: PCHS=%u/%u/%u LCHS=%u/%u/%u 0x%llx sectors\n", devcount_ahci,
+                ttt = 0x1234567890abcdef;
+                BX_INFO("AHCI %d-P#%d: PCHS=%u/%u/%u LCHS=%u/%u/%u 0x%llx sectors %llx\n", devcount_ahci,
                         u8Port, cylinders, heads, spt, lgeo.cylinders, lgeo.heads, lgeo.spt,
-                        U64_PRINT(sectors));
+                        sectors, ttt);
 
                 bios_dsk->devices[hd_index].lchs = lgeo;
 
