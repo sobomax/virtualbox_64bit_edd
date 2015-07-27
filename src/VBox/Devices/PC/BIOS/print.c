@@ -190,12 +190,12 @@ void bios_printf(uint16_t action, const char *s, ...)
                     put_uint(action, arg, format_width, 0);
                 }
                 else if (c == 'l' && s[1] == 'l') {
+                    uint64_t llval;
                     uint16_t *cp16;
-                    uint8_t cp8[8];
 
                     s += 2;
                     c = *s;
-                    cp16 = (uint16_t *)cp8;
+                    cp16 = (uint16_t *)llval;
                     cp16[0] = va_arg( args, uint16_t );
                     cp16[1] = va_arg( args, uint16_t );
                     cp16[2] = va_arg( args, uint16_t );
@@ -208,7 +208,7 @@ void bios_printf(uint16_t action, const char *s, ...)
                         else
                             hexadd = 'A';
                         for (i=format_width-1; i>=0; i--) {
-                            nibble = cp8[i];
+                            nibble =  (llval >> (i * 4)) & 0x000f;
                             send (action, (nibble<=9)? (nibble+'0') : (nibble-10+hexadd));
                         }
                     }
