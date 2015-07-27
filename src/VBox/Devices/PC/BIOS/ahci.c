@@ -24,11 +24,9 @@
 #include "vds.h"
 
 #if DEBUG_AHCI
-# define RDBG_AHCI(...)        BX_INFO(__VA_ARGS__)
-# define DBG_AHCI(...)
+# define DBG_AHCI(...)        BX_INFO(__VA_ARGS__)
 #else
 # define DBG_AHCI(...)
-# define RDBG_AHCI(...)
 #endif
 
 /* Number of S/G table entries in EDDS. */
@@ -496,7 +494,7 @@ int ahci_read_sectors(bio_dsk_t __far *bios_dsk)
     if (device_id > BX_MAX_AHCI_DEVICES)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
-    RDBG_AHCI("%s: %u sectors @ LBA %lx%lx, device %d, port %d\n", __func__,
+    DBG_AHCI("%s: %u sectors @ LBA %lx%lx, device %d, port %d\n", __func__,
              bios_dsk->drqp.nsect, (uint32_t)(bios_dsk->drqp.lba64 >> 32),
              (uint32_t)bios_dsk->drqp.lba64,
              device_id, bios_dsk->ahcidev[device_id].port);
@@ -504,7 +502,7 @@ int ahci_read_sectors(bio_dsk_t __far *bios_dsk)
     high_bits_save(bios_dsk->ahci_seg :> 0);
     ahci_port_init(bios_dsk->ahci_seg :> 0, bios_dsk->ahcidev[device_id].port);
     ahci_cmd_data(bios_dsk, AHCI_CMD_READ_DMA_EXT);
-    RDBG_AHCI("%s: transferred %lu bytes\n", __func__, ((ahci_t __far *)(bios_dsk->ahci_seg :> 0))->aCmdHdr[1]);
+    DBG_AHCI("%s: transferred %lu bytes\n", __func__, ((ahci_t __far *)(bios_dsk->ahci_seg :> 0))->aCmdHdr[1]);
     bios_dsk->drqp.trsfsectors = bios_dsk->drqp.nsect;
 #ifdef DMA_WORKAROUND
     rep_movsw(bios_dsk->drqp.buffer, bios_dsk->drqp.buffer, bios_dsk->drqp.nsect * 512 / 2);
@@ -528,8 +526,9 @@ int ahci_write_sectors(bio_dsk_t __far *bios_dsk)
     if (device_id > BX_MAX_AHCI_DEVICES)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
-    DBG_AHCI("%s: %u sectors @ LBA %llu, device %d, port %d\n", __func__,
-             bios_dsk->drqp.nsect, bios_dsk->drqp.lba64, device_id,
+    DBG_AHCI("%s: %u sectors @ LBA %lx%lx, device %d, port %d\n", __func__,
+             bios_dsk->drqp.nsect, (uint32_t)(bios_dsk->drqp.lba64 >> 32),
+             (uint32_t)bios_dsk->drqp.lba64, device_id,
              bios_dsk->ahcidev[device_id].port);
 
     high_bits_save(bios_dsk->ahci_seg :> 0);
@@ -688,7 +687,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 if (sectors == 0x0FFFFFFF)  /* For disks bigger than ~128GB */
                     sectors = *(uint64_t *)(abBuffer+(100*2)); // words 100 to 103
 
-                RDBG_AHCI("AHCI: %lx%lx sectors\n", (uint32_t)(sectors >> 32),
+                DBG_AHCI("AHCI: %lx%lx sectors\n", (uint32_t)(sectors >> 32),
                   (uint32_t)sectors);
 
                 bios_dsk->ahcidev[devcount_ahci].port = u8Port;
