@@ -196,7 +196,7 @@ void bios_printf(uint16_t action, const char *s, ...)
                     s += 2;
                     c = *s;
                     cp16 = (uint16_t *)llval;
-                    cp16[0] = va_arg( args, uint16_t );
+                    cp16[0] = arg;
                     cp16[1] = va_arg( args, uint16_t );
                     cp16[2] = va_arg( args, uint16_t );
                     cp16[3] = va_arg( args, uint16_t );
