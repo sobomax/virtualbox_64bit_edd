@@ -32,6 +32,7 @@
 /* Number of S/G table entries in EDDS. */
 #define NUM_EDDS_SG         16
 
+#define	U64_PRINT(val)      (uint32_t)(val >> 32), (uint32_t)(val)
 
 /**
  * AHCI PRDT structure.
@@ -732,7 +733,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
 
                 BX_INFO("AHCI %d-P#%d: PCHS=%u/%u/%u LCHS=%u/%u/%u 0x%llx sectors\n", devcount_ahci,
                         u8Port, cylinders, heads, spt, lgeo.cylinders, lgeo.heads, lgeo.spt,
-                        sectors);
+                        U64_PRINT(sectors));
 
                 bios_dsk->devices[hd_index].lchs = lgeo;
 
