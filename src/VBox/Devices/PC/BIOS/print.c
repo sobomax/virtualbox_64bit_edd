@@ -144,7 +144,9 @@ void put_str_near(uint16_t action, const char __near *s)
 //
 //   Supports %[format_width][length]format
 //   where format can be x,X,u,d,s,S,c
-//   and the optional length modifier is l (ell)
+//   and the optional length modifier is l (ell, long 32-bit) or ll
+//   (long long, 64-bit).
+//   Only x,X work with ll
 //--------------------------------------------------------------------------
 void bios_printf(uint16_t action, const char *s, ...)
 {
