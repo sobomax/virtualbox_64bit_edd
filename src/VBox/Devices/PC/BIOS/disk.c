@@ -385,13 +385,13 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
         segment = i13_ext->segment;
         offset  = i13_ext->offset;
 
-        BX_DEBUG_INT13_HD("%s: %d sectors from LBA %lx%lx @ %04x:%04x\n", __func__,
-                          count, i13_ext->lba2, i13_ext->lba1, segment, offset);
-
         // Get 64 bits lba and check
         lba = i13_ext->lba2;
         lba <<= 32;
         lba |= i13_ext->lba1;
+
+        BX_DEBUG_INT13_HD("%s: %d sectors from LBA %llx @ %04x:%04x\n", __func__,
+                          count, lba, segment, offset);
 
         type = bios_dsk->devices[device].type;
         if (lba >= bios_dsk->devices[device].sectors64) {
