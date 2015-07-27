@@ -337,7 +337,7 @@ static void ahci_cmd_data(bio_dsk_t __far *bios_dsk, uint8_t cmd)
     ahci->abCmd[8]  = (bios_dsk->drqp.lba64 >> 24) & 0xff;
     ahci->abCmd[9]  = (bios_dsk->drqp.lba64 >> 32) & 0xff;
     ahci->abCmd[10] = (bios_dsk->drqp.lba64 >> 40) & 0xff;
-    ahci->abCmd[11] = (bios_dsk->drqp.lba64 >> 48) & 0xff;
+    ahci->abCmd[11] = 0;
 
     ahci->abCmd[12] = (uint8_t)(n_sect & 0xff);
     ahci->abCmd[13] = (uint8_t)((n_sect >> 8) & 0xff);
