@@ -493,9 +493,8 @@ int ahci_read_sectors(bio_dsk_t __far *bios_dsk)
     if (device_id > BX_MAX_AHCI_DEVICES)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
-    DBG_AHCI("%s: %u sectors @ LBA %lx%lx, device %d, port %d\n", __func__,
-             bios_dsk->drqp.nsect, (uint32_t)(bios_dsk->drqp.lba64 >> 32),
-             (uint32_t)bios_dsk->drqp.lba64,
+    DBG_AHCI("%s: %u sectors @ LBA %llx, device %d, port %d\n", __func__,
+             bios_dsk->drqp.nsect, bios_dsk->drqp.lba64,
              device_id, bios_dsk->ahcidev[device_id].port);
 
     high_bits_save(bios_dsk->ahci_seg :> 0);
@@ -525,9 +524,8 @@ int ahci_write_sectors(bio_dsk_t __far *bios_dsk)
     if (device_id > BX_MAX_AHCI_DEVICES)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
-    DBG_AHCI("%s: %u sectors @ LBA %lx%lx, device %d, port %d\n", __func__,
-             bios_dsk->drqp.nsect, (uint32_t)(bios_dsk->drqp.lba64 >> 32),
-             (uint32_t)bios_dsk->drqp.lba64, device_id,
+    DBG_AHCI("%s: %u sectors @ LBA %llx, device %d, port %d\n", __func__,
+             bios_dsk->drqp.nsect, bios_dsk->drqp.lba64, device_id,
              bios_dsk->ahcidev[device_id].port);
 
     high_bits_save(bios_dsk->ahci_seg :> 0);
@@ -660,7 +658,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
             VBOXAHCI_PORT_READ_REG(ahci->iobase, u8Port, AHCI_REG_PORT_SIG, val);
             if (val == 0x101)
             {
-                uint64_t    sectors, ttt;
+                uint64_t    sectors;
                 uint16_t    cylinders, heads, spt;
                 chs_t       lgeo;
                 uint8_t     idxCmosChsBase;
@@ -686,8 +684,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 if (sectors == 0x0FFFFFFF)  /* For disks bigger than ~128GB */
                     sectors = *(uint64_t *)(abBuffer+(100*2)); // words 100 to 103
 
-                DBG_AHCI("AHCI: %lx%lx sectors\n", (uint32_t)(sectors >> 32),
-                  (uint32_t)sectors);
+                DBG_AHCI("AHCI: %llx sectors\n", sectors);
 
                 bios_dsk->ahcidev[devcount_ahci].port = u8Port;
                 bios_dsk->devices[hd_index].type        = DSK_TYPE_AHCI;
@@ -729,10 +726,9 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 else
                     set_geom_lba(&lgeo, sectors);   /* Default EDD-style translated LBA geometry. */
 
-                ttt = 0x1234567890abcdef;
-                BX_INFO("AHCI %d-P#%d: PCHS=%u/%u/%u LCHS=%u/%u/%u 0x%llx sectors %llx\n", devcount_ahci,
+                BX_INFO("AHCI %d-P#%d: PCHS=%u/%u/%u LCHS=%u/%u/%u 0x%llx sectors\n", devcount_ahci,
                         u8Port, cylinders, heads, spt, lgeo.cylinders, lgeo.heads, lgeo.spt,
-                        sectors, ttt);
+                        sectors);
 
                 bios_dsk->devices[hd_index].lchs = lgeo;
 
