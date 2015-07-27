@@ -497,7 +497,8 @@ int ahci_read_sectors(bio_dsk_t __far *bios_dsk)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
     RDBG_AHCI("%s: %u sectors @ LBA %lx%lx, device %d, port %d\n", __func__,
-             bios_dsk->drqp.nsect, (bios_dsk->drqp.lba64 >> 32), (uint32_t)bios_dsk->drqp.lba64,
+             bios_dsk->drqp.nsect, (uint32_t)(bios_dsk->drqp.lba64 >> 32),
+             (uint32_t)bios_dsk->drqp.lba64,
              device_id, bios_dsk->ahcidev[device_id].port);
 
     high_bits_save(bios_dsk->ahci_seg :> 0);
