@@ -55,7 +55,7 @@
 #define DEBUG_SCSI      0
 #define DEBUG_CD_BOOT   0
 #define DEBUG_ELTORITO  0
-#define DEBUG_INT13_HD  1
+#define DEBUG_INT13_HD  0
 #define DEBUG_INT13_FL  0
 #define DEBUG_INT13_CD  0
 #define DEBUG_INT15     0
