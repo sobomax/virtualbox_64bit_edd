@@ -1,3 +1,4 @@
+/* $Id: path.c $ */
 /** @file
  *
  * VirtualBox Windows Guest Shared Folders

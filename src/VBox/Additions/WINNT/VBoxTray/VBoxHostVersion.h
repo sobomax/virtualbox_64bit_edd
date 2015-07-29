@@ -1,3 +1,4 @@
+/* $Id: VBoxHostVersion.h $ */
 /** @file
  * VBoxHostVersion - Checks the host's VirtualBox version and notifies
  *                   the user in case of an update.

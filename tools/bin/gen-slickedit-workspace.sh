@@ -5,7 +5,7 @@
 #
 
 #
-# Copyright (C) 2009-2012 Oracle Corporation
+# Copyright (C) 2009-2015 Oracle Corporation
 #
 # This file is part of VirtualBox Open Source Edition (OSE), as
 # available from http://www.virtualbox.org. This file is free software;
@@ -145,7 +145,7 @@ my_file()
             MY_FOLDER="$1-Others.lst"
             ;;
     esac
-    if test -n "$3"; 
+    if test -n "$3";
     then
         MY_FOLDER="$1-$3.lst"
     fi
@@ -170,7 +170,7 @@ my_wildcard()
     else
         MY_FOLDER="$1-All.lst"
     fi
-    EXCLUDES="*.log;*.kup;*~;*.pyc;*.exe;*.sys;*.dll;*.o;*.obj;*.lib;*.a;*.ko;*.class;*.cvsignore;*.done;*.project;*.actionScriptProperties;*.scm-settings;.svn/*"
+    EXCLUDES="*.log;*.kup;*~;*.pyc;*.exe;*.sys;*.dll;*.o;*.obj;*.lib;*.a;*.ko;*.class;*.cvsignore;*.done;*.project;*.actionScriptProperties;*.scm-settings;*.svn-base;.svn/*"
     echo '        <F N="'"${2}"'/*" Recurse="1" Excludes="'"${EXCLUDES}"'"/>' >> "${MY_FOLDER}"
 }
 
@@ -230,16 +230,16 @@ my_generate_folder()
         do
             if test -d "${f}";
             then
-                if test -z "${MY_OPT_USE_WILDCARDS}"; 
+                if test -z "${MY_OPT_USE_WILDCARDS}";
                 then
                     my_sub_tree "${MY_FILE}" "${f}"
                 else
                     case "${f}" in
-                        ${MY_ROOT_DIR}/include*) 
+                        ${MY_ROOT_DIR}/include*)
                             #my_sub_tree "${MY_FILE}" "${f}" "Headers"
                             my_wildcard "${MY_FILE}" "${f}" "Headers"
                             ;;
-                        *)  my_wildcard "${MY_FILE}" "${f}" 
+                        *)  my_wildcard "${MY_FILE}" "${f}"
                             ;;
                     esac
                 fi
@@ -263,7 +263,7 @@ my_generate_folder()
     fi
     if test -s "${MY_FILE}-Headers.lst";
     then
-        if test -z "${MY_OPT_USE_WILDCARDS}"; 
+        if test -z "${MY_OPT_USE_WILDCARDS}";
         then
             echo '        <Folder Name="Headers"  Filters="*.h;*.hpp">' >> "${MY_FILE}"
         else
@@ -574,6 +574,8 @@ EOF
 #define VBOX_WITH_HGCM                  1
 #define VBOXCALL
 
+#define PGM_ALL_CB_DECL(type)           type
+#define PGM_ALL_CB2_DECL(type)          type
 #define PGM_CTX(a,b)                    b
 #define PGM_CTX3(a,b,c)                 c
 #define PGM_GST_NAME(name)              PGM_GST_NAME_AMD64(name)
@@ -623,6 +625,7 @@ EOF
 #define IEM_MC_LOCAL(a_Type, a_Name)                       a_Type a_Name
 #define IEM_MC_ARG(a_Type, a_Name, a_iArg)                 a_Type a_Name
 #define IEM_MC_ARG_CONST(a_Type, a_Name, a_Value, a_iArg)  a_Type const a_Name = a_Value
+#define IEM_STATIC 
 
 #define RTASN1_IMPL_GEN_SEQ_OF_TYPEDEFS_AND_PROTOS(a_SeqOfType, a_ItemType, a_DeclMacro, a_ImplExtNm) typedef struct a_SeqOfType { RTASN1SEQUENCECORE SeqCore; RTASN1ALLOCATION Allocation; uint32_t cItems; RT_CONCAT(P,a_ItemType) paItems; } a_SeqOfType; typedef a_SeqOfType *P##a_SeqOfType, const *PC##a_SeqOfType; int a_ImplExtNm##_DecodeAsn1(struct RTASN1CURSOR *pCursor, uint32_t fFlags, P##a_SeqOfType pThis, const char *pszErrorTag); int a_ImplExtNm##_Compare(PC##a_SeqOfType pLeft, PC##a_SeqOfType pRight)
 #define RTASN1_IMPL_GEN_SET_OF_TYPEDEFS_AND_PROTOS(a_SetOfType, a_ItemType, a_DeclMacro, a_ImplExtNm) typedef struct a_SetOfType { RTASN1SETCORE SetCore; RTASN1ALLOCATION Allocation; uint32_t cItems; RT_CONCAT(P,a_ItemType) paItems; } a_SetOfType; typedef a_SetOfType *P##a_SetOfType, const *PC##a_SetOfType; int a_ImplExtNm##_DecodeAsn1(struct RTASN1CURSOR *pCursor, uint32_t fFlags, P##a_SetOfType pThis, const char *pszErrorTag); int a_ImplExtNm##_Compare(PC##a_SetOfType pLeft, PC##a_SetOfType pRight)
@@ -807,7 +810,7 @@ my_abs_dir "tools"
 if test -n "${MY_WINDOWS_HOST}"; then
     MY_KMK_INVOCATION="${MY_ABS_DIR}/win.x86/bin/rexx.exe ${MY_ABS_DIR}/envSub.cmd kmk.exe"
 else
-    MY_KMK_INVOCATION="LANG=C ${MY_ABS_DIR}/env.sh --quiet --no-wine kmk"
+    MY_KMK_INVOCATION="/usr/bin/env LANG=C ${MY_ABS_DIR}/env.sh --quiet --no-wine kmk"
 fi
 
 
@@ -909,6 +912,7 @@ fi
 # src/VBox/GuestHost
 my_generate_project "HGSMI-GH"      "src/VBox/GuestHost/HGSMI"              --begin-incs "include"                                          --end-includes "src/VBox/GuestHost/HGSMI"
 test -z "$MY_OPT_MINIMAL" && \
+my_generate_project "DnD-GH"        "src/VBox/GuestHost/DragAndDrop"        --begin-incs "include"                                          --end-includes "src/VBox/GuestHost/DragAndDrop"
 my_generate_project "OpenGL-GH"     "src/VBox/GuestHost/OpenGL"             --begin-incs "include" "src/VBox/GuestHost/OpenGL"              --end-includes "src/VBox/GuestHost/OpenGL"
 my_generate_project "ShClip-GH"     "src/VBox/GuestHost/SharedClipboard"    --begin-incs "include"                                          --end-includes "src/VBox/GuestHost/SharedClipboard"
 
@@ -920,6 +924,7 @@ my_generate_project "VBoxUSB"       "src/VBox/HostDrivers/VBoxUSB"          --be
 
 # src/VBox/HostServices
 my_generate_project "GuestCntl"     "src/VBox/HostServices/GuestControl"    --begin-incs "include" "src/VBox/HostServices/GuestControl"     --end-includes "src/VBox/HostServices/GuestControl"
+my_generate_project "DragAndDrop"   "src/VBox/HostServices/DragAndDrop"     --begin-incs "include" "src/VBox/HostServices/DragAndDrop"      --end-includes "src/VBox/HostServices/DragAndDrop"
 my_generate_project "GuestProps"    "src/VBox/HostServices/GuestProperties" --begin-incs "include" "src/VBox/HostServices/GuestProperties"  --end-includes "src/VBox/HostServices/GuestProperties"
 my_generate_project "ShClip-HS"     "src/VBox/HostServices/SharedClipboard" --begin-incs "include" "src/VBox/HostServices/SharedClipboard"  --end-includes "src/VBox/HostServices/SharedClipboard"
 my_generate_project "SharedFolders" "src/VBox/HostServices/SharedFolders"   --begin-incs "include" "src/VBox/HostServices/SharedFolders"    --end-includes "src/VBox/HostServices/SharedFolders" "include/VBox/shflsvc.h"
@@ -941,13 +946,13 @@ my_generate_project "Net-NAT"       "src/VBox/NetworkServices/NAT"          --be
 my_generate_project "Net-NetLib"    "src/VBox/NetworkServices/NetLib"       --begin-incs "include" "src/VBox/NetworkServices/NetLib"        --end-includes "src/VBox/NetworkServices/NetLib"
 
 # src/VBox/RDP
-my_generate_project "RDP-Client"    "src/VBox/RDP/client"                   --begin-incs "include" "src/VBox/RDP/client"                    --end-includes "src/VBox/RDP/client"
+my_generate_project "RDP-Client"    "src/VBox/RDP/client-1.8.3"             --begin-incs "include" "src/VBox/RDP/client-1.8.3"              --end-includes "src/VBox/RDP/client-1.8.3"
 my_generate_project "RDP-Server"    "src/VBox/RDP/server"                   --begin-incs "include" "src/VBox/RDP/server"                    --end-includes "src/VBox/RDP/server"
 my_generate_project "RDP-WebClient" "src/VBox/RDP/webclient"                --begin-incs "include" "src/VBox/RDP/webclient"                 --end-includes "src/VBox/RDP/webclient"
 my_generate_project "RDP-Misc"      "src/VBox/RDP"                          --begin-incs "include"                                          --end-includes "src/VBox/RDP/auth" "src/VBox/RDP/tscpasswd" "src/VBox/RDP/x11server"
 
-# src/VBox/Testsuite
-my_generate_project "Testsuite"     "src/VBox/Testsuite"                    --begin-incs "include"                                          --end-includes "src/VBox/Testsuite"
+# src/VBox/ValidationKit
+my_generate_project "ValidationKit" "src/VBox/ValidationKit"                --begin-incs "include"                                          --end-includes "src/VBox/ValidationKit"
 
 # src/VBox/ExtPacks
 my_generate_project "ExtPacks"      "src/VBox/ExtPacks"                     --begin-incs "include"                                          --end-includes "src/VBox/ExtPacks"
@@ -962,7 +967,7 @@ my_generate_project "bldprogs"      "src/bldprogs"                          --be
 my_generate_project "zlib"          "src/libs/zlib-1.2.6"                   --begin-incs "include"                                          --end-includes "src/libs/zlib-1.2.6/*.c" "src/libs/zlib-1.2.6/*.h"
 my_generate_project "liblzf"        "src/libs/liblzf-3.4"                   --begin-incs "include"                                          --end-includes "src/libs/liblzf-3.4"
 my_generate_project "libpng"        "src/libs/libpng-1.2.8"                 --begin-incs "include"                                          --end-includes "src/libs/libpng-1.2.8/*.c" "src/libs/libpng-1.2.8/*.h"
-my_generate_project "openssl"       "src/libs/openssl-0.9.8y"               --begin-incs "include" "src/libs/openssl-0.9.8y/crypto"         --end-includes "src/libs/openssl-0.9.8y"
+my_generate_project "openssl"       "src/libs/openssl-1.0.1o"               --begin-incs "include" "src/libs/openssl-1.0.1o/crypto"         --end-includes "src/libs/openssl-1.0.1o"
 my_generate_project "kStuff"        "src/libs/kStuff"                       --begin-incs "include" "src/libs/kStuff/kStuff/include"         --end-includes "src/libs/kStuff"
 
 
@@ -970,8 +975,7 @@ my_generate_project "kStuff"        "src/libs/kStuff"                       --be
 my_generate_project "VBoxHeaders"   "include"                               --begin-incs "include"                                          --end-includes "include/VBox"
 
 # Misc
-my_generate_project "misc"          "src/tests"                             --begin-incs "include"                                          --end-includes \
-    "src/tests" \
+my_generate_project "misc"          "."                                     --begin-incs "include"                                          --end-includes \
     "configure" \
     "configure.vbs" \
     "Config.kmk" \

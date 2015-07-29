@@ -1,3 +1,4 @@
+/* $Id: vbsfhlp.h $ */
 /** @file
  *
  * VirtualBox Windows Guest Shared Folders

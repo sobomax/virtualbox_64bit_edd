@@ -1,3 +1,4 @@
+/* $Id: info.c $ */
 /** @file
  *
  * VirtualBox Windows Guest Shared Folders

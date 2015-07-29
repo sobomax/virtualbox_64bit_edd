@@ -1,3 +1,4 @@
+/* $Id: resource.h $ */
 /** @file
  *
  * VBoxService - Guest Additions Service

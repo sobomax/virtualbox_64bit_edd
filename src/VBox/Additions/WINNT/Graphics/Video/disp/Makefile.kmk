@@ -4,7 +4,7 @@
 #
 
 #
-# Copyright (C) 2011-2012 Oracle Corporation
+# Copyright (C) 2011-2015 Oracle Corporation
 #
 # This file is part of VirtualBox Open Source Edition (OSE), as
 # available from http://www.virtualbox.org. This file is free software;
@@ -21,7 +21,7 @@ include $(KBUILD_PATH)/subheader.kmk
 #
 # VBoxDisp - Windows Guest Additions XPDM Display Driver
 #
-# Note. This has to run on NT4! (*_NT4 => *_W2K3 when targetting 64-bit.)
+# Note. This has to run on NT4! (*_NT4 => *_W2K3 when targeting 64-bit.)
 #
 SYSMODS += VBoxDisp
 VBoxDisp_TEMPLATE      = VBOXGUESTR0
@@ -112,7 +112,6 @@ VBoxDispD3D_SOURCES  = \
 	wddm/VBoxDispD3D.cpp \
 	wddm/VBoxDispD3DIf.cpp \
 	wddm/VBoxDispCm.cpp \
-	wddm/VBoxScreen.cpp \
 	wddm/VBoxDispKmt.cpp \
 	wddm/VBoxDispDbg.cpp \
 	wddm/VBoxD3DIf.cpp \
@@ -217,6 +216,14 @@ DumpD3DCaps9_SOURCES  = \
 	wddm/dbg/DumpD3DCaps9.cpp
 DumpD3DCaps9_LIBS     = $(VBOX_LIB_IPRT_GUEST_R3) d3d9.lib
 DumpD3DCaps9_LDFLAGS.win = /SUBSYSTEM:CONSOLE
+
+PROGRAMS += D3DFeatureLevel
+D3DFeatureLevel_TEMPLATE = VBOXR3EXE
+D3DFeatureLevel_SDKS     = ReorderCompilerIncs $(VBOX_WINDDK_GST_WLH)
+D3DFeatureLevel_SOURCES  = \
+	wddm/dbg/D3DFeatureLevel.cpp
+D3DFeatureLevel_LIBS     = $(VBOX_LIB_IPRT_GUEST_R3) d3d11.lib
+D3DFeatureLevel_LDFLAGS.win = /SUBSYSTEM:CONSOLE
 
 endif #VBOXVIDEOWINDBG
 

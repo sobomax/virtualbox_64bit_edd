@@ -1,3 +1,4 @@
+/* $Id: VBoxHelpers.cpp $ */
 /** @file
  * helpers - Guest Additions Service helper functions
  */
