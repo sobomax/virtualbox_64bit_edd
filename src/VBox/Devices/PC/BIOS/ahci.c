@@ -493,7 +493,7 @@ int ahci_read_sectors(bio_dsk_t __far *bios_dsk)
     if (device_id > BX_MAX_AHCI_DEVICES)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
-    DBG_AHCI("%s: %u sectors @ LBA %llx, device %d, port %d\n", __func__,
+    DBG_AHCI("%s: %u sectors @ LBA 0x%llx, device %d, port %d\n", __func__,
              bios_dsk->drqp.nsect, bios_dsk->drqp.lba64,
              device_id, bios_dsk->ahcidev[device_id].port);
 
@@ -524,7 +524,7 @@ int ahci_write_sectors(bio_dsk_t __far *bios_dsk)
     if (device_id > BX_MAX_AHCI_DEVICES)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
-    DBG_AHCI("%s: %u sectors @ LBA %llx, device %d, port %d\n", __func__,
+    DBG_AHCI("%s: %u sectors @ LBA 0x%llx, device %d, port %d\n", __func__,
              bios_dsk->drqp.nsect, bios_dsk->drqp.lba64, device_id,
              bios_dsk->ahcidev[device_id].port);
 
@@ -684,7 +684,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 if (sectors == 0x0FFFFFFF)  /* For disks bigger than ~128GB */
                     sectors = *(uint64_t *)(abBuffer+(100*2)); // words 100 to 103
 
-                DBG_AHCI("AHCI: %llx sectors\n", sectors);
+                DBG_AHCI("AHCI: 0x%llx sectors\n", sectors);
 
                 bios_dsk->ahcidev[devcount_ahci].port = u8Port;
                 bios_dsk->devices[hd_index].type        = DSK_TYPE_AHCI;

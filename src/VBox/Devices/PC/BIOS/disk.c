@@ -390,7 +390,7 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
         lba <<= 32;
         lba |= i13_ext->lba1;
 
-        BX_DEBUG_INT13_HD("%s: %d sectors from LBA %llx @ %04x:%04x\n", __func__,
+        BX_DEBUG_INT13_HD("%s: %d sectors from LBA 0x%llx @ %04x:%04x\n", __func__,
                           count, lba, segment, offset);
 
         type = bios_dsk->devices[device].type;
