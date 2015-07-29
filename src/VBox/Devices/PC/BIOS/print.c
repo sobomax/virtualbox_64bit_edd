@@ -213,6 +213,8 @@ void bios_printf(uint16_t action, const char *s, ...)
                             nibble =  (llval >> (i * 4)) & 0x000f;
                             send (action, (nibble<=9)? (nibble+'0') : (nibble-10+hexadd));
                         }
+                    } else {
+                        BX_PANIC("bios_printf: unknown %ll format\n");
                     }
                 }
                 else if (c == 'l') {
