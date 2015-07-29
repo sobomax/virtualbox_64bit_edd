@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 #
-# Copyright (C) 2006-2012 Oracle Corporation
+# Copyright (C) 2006-2015 Oracle Corporation
 #
 # This file is part of VirtualBox Open Source Edition (OSE), as
 # available from http://www.virtualbox.org. This file is free software;
@@ -41,7 +41,7 @@ export DH_COMPAT=4
 #  BLEEDING_EDGE=xyz
 
 package  := virtualbox
-verpkg   := virtualbox-4.3
+verpkg   := virtualbox-5.0
 current  := $(shell pwd)
 vboxroot := $(shell cd ../../../..; pwd)
 pkgdir   := $(if $(PKGDIR),$(PKGDIR),$(shell cd ../../../../..; pwd))
@@ -91,9 +91,10 @@ ifneq ($(MAKECMDGOALS),clean)
 endif
 
 # Location of custom built Qt libraries (see below)
-qtstdc6  := /home/vbox/Qt-4.7.4-stdc++6-$(arch)
+qtstdc6  := /home/vbox/Qt-4.8.6-stdc++6-$(arch)
 
 cfg_flags := $(if $(NOQT),--disable-qt,) \
+	     $(if $(filter _Debian_squeeze,$(debrel)),--with-qt4-dir=$(qtstdc6)) \
 	     $(if $(filter _Debian_squeeze,$(debrel)),--build-libvpx,) \
 	     $(if $(ose),--ose,) $(if $(LINUX),--with-linux=$(LINUX),) \
 	     $(if $(HEADLESS),--build-headless,) \
@@ -242,6 +243,8 @@ else
 endif
 	mv $(archdir) $(prefix)/usr/lib/$(package)
 	ln -s ../VBoxVMM.so $(prefix)/usr/lib/$(package)/components/VBoxVMM.so
+	mkdir $(prefix)/sbin
+	ln -s ../etc/init.d/vboxdrv $(prefix)/sbin/rcvboxdrv
 	rmdir $(prefix)/opt
 	dh_desktop
 	$(if $(NOMODS),,dh_installmodules)

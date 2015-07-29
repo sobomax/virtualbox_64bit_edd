@@ -28,7 +28,6 @@
 
 #include "VBoxDispD3DCmn.h"
 #include "VBoxDispD3D.h"
-#include "VBoxScreen.h"
 #include <VBox/VBoxCrHgsmi.h>
 
 #include <Psapi.h>
@@ -218,8 +217,6 @@ HRESULT vboxDispMpTstStop();
 #endif
 
 #define VBOXDISP_WITH_WINE_BB_WORKAROUND
-
-static VBOXSCREENMONRUNNER g_VBoxScreenMonRunner;
 
 //#define VBOXWDDMOVERLAY_TEST
 
@@ -523,7 +520,7 @@ static BOOLEAN vboxWddmDalCheckAdd(PVBOXWDDMDISP_DEVICE pDevice, PVBOXWDDMDISP_A
     }
     else
     {
-        Assert(pAlloc->fDirtyWrite == fWrite);
+        Assert(pAlloc->fDirtyWrite == fWrite || pAlloc->pRc->RcDesc.fFlags.SharedResource);
     }
     pAlloc->fDirtyWrite |= fWrite;
     pAlloc->fEverWritten |= fWrite;
@@ -6258,11 +6255,14 @@ static HRESULT APIENTRY vboxWddmDispCreateDevice (IN HANDLE hAdapter, IN D3DDDIA
 
     if (SUCCEEDED(hr))
     {
-        if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+        /* Get system D3D DLL handle and prevent its unloading until entire process termination (GET_MODULE_HANDLE_EX_FLAG_PIN).
+         * This is important because even after guest App issued CloseAdatper() call, we still use pointers provided by DLL. */
+        if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
                                 (LPCWSTR)pDevice->RtCallbacks.pfnAllocateCb,
                                 &pDevice->hHgsmiTransportModule))
         {
             Assert(pDevice->hHgsmiTransportModule);
+            vboxVDbgPrintR((__FUNCTION__": system D3D DLL referenced with GET_MODULE_HANDLE_EX_FLAG_PIN flag\n"));
         }
         else
         {
@@ -6301,6 +6301,9 @@ static HRESULT APIENTRY vboxWddmDispCloseAdapter (IN HANDLE hAdapter)
 
     vboxVDbgPrint(("<== "__FUNCTION__", hAdapter(0x%p)\n", hAdapter));
 
+#ifdef DEBUG
+    VbglR3Term();
+#endif
     return S_OK;
 }
 
@@ -6340,6 +6343,10 @@ static BOOL vboxDispIsDDraw(__inout D3DDDIARG_OPENADAPTER*  pOpenData)
 
 HRESULT APIENTRY OpenAdapter(__inout D3DDDIARG_OPENADAPTER*  pOpenData)
 {
+#ifdef DEBUG
+    VbglR3Init();
+#endif
+
     VBOXDISP_DDI_PROLOGUE_GLBL();
 
     vboxVDbgPrint(("==> "__FUNCTION__"\n"));

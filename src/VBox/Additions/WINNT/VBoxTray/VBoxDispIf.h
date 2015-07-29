@@ -1,3 +1,4 @@
+/* $Id: VBoxDispIf.h $ */
 /** @file
  * VBoxTray - Display Settings Interface abstraction for XPDM & WDDM
  */

@@ -1,3 +1,4 @@
+/* $Id: VBoxDispIf.cpp $ */
 /** @file
  * VBoxTray - Display Settings Interface abstraction for XPDM & WDDM
  */
@@ -21,6 +22,17 @@
 #include <iprt/assert.h>
 
 #include <malloc.h>
+
+#ifdef DEBUG_misha
+#define WARN(_m) do { \
+            Assert(0); \
+            Log(_m); \
+        } while (0)
+#else
+#define WARN(_m) do { \
+            Log(_m); \
+        } while (0)
+#endif
 
 #ifdef VBOX_WITH_WDDM
 #include <iprt/asm.h>

@@ -145,7 +145,7 @@ VIAddVersionKey "InternalName"      "${PRODUCT_OUTPUT}"
 !ifdef _DEBUG
   BrandingText "VirtualBox Windows Additions $%VBOX_VERSION_STRING% (r$%VBOX_SVN_REV%) - Debug Build"
 !else
-  BrandingText "VirtualBox Windows Additions $%VBOX_VERSION_STRING%"
+  BrandingText "VirtualBox Windows Additions $%VBOX_VERSION_STRING% r$%VBOX_SVN_REV%"
 !endif
 
 !ifdef VBOX_WITH_LICENSE_DISPLAY
@@ -234,7 +234,6 @@ Var g_bNoVideoDrv                       ; Cmd line: Do not install the VBoxVideo
 Var g_bNoGuestDrv                       ; Cmd line: Do not install the VBoxGuest driver
 Var g_bNoMouseDrv                       ; Cmd line: Do not install the VBoxMouse driver
 Var g_bWithAutoLogon                    ; Cmd line: Install VBoxGINA / VBoxCredProv for auto logon support
-Var g_bWithVBoxMMR                      ; Cmd line: Install VBoxMMR for media redirection support
 Var g_bWithD3D                          ; Cmd line: Install Direct3D support
 Var g_bOnlyExtract                      ; Cmd line: Only extract all files, do *not* install them. Only valid with param "/D" (target directory)
 Var g_bPostInstallStatus                ; Cmd line: Post the overall installation status to some external program (VBoxTray)
@@ -382,12 +381,6 @@ Function HandleCommandLine
         StrCpy $g_bWithAutoLogon "true"
         ${Break}
 
-!if $%VBOX_WITH_MMR% == "1"
-      ${Case} '/with_vboxmmr'
-        StrCpy $g_bWithVBoxMMR "true"
-        ${Break}
-!endif
-
 !if $%VBOX_WITH_CROGL% == "1"
       ${Case} '/with_d3d'
       ${Case} '/with_direct3d'
@@ -444,7 +437,6 @@ usage:
                     /uninstall$\t$\tJust uninstalls the Guest Additions and exits$\r$\n \
                     /with_autologon$\tInstalls auto-logon support$\r$\n \
                     /with_d3d$\tInstalls D3D support$\r$\n \
-                    /with_vboxmmr$\tInstalls multimedia redirection (MMR) support$\r$\n \
                     /with_wddm$\tInstalls the WDDM instead of the XPDM graphics driver$\r$\n \
                     /xres=X$\t$\tSets the guest's display resolution (width in pixels)$\r$\n \
                     /yres=Y$\t$\tSets the guest's display resolution (height in pixels)$\r$\n \
@@ -588,20 +580,6 @@ Function CheckForInstalledComponents
     StrCpy $g_bWithAutoLogon "true" ; Force update
   ${Else}
     ${LogVerbose} "Auto-logon support was not installed previously"
-  ${EndIf}
-
-  ; Check for installed MMR support and enable updating
-  ; those modules if needed
-  ${If}    ${FileExists} "$g_strSystemDir\VBoxMMR.exe"
-!if $%BUILD_TARGET_ARCH% == "amd64"
-  ${AndIf} ${FileExists} "$g_strSysWow64\VBoxMMRHook.dll"
-!else
-  ${AndIf} ${FileExists} "$g_strSystemDir\VBoxMMRHook.dll"
-!endif
-    ${LogVerbose} "MultiMedia Redirection support (MMR) was installed previously"
-    StrCpy $g_bWithVBoxMMR "true" ; Force update
-  ${Else}
-    ${LogVerbose} "MultiMedia Redirection support (MMR) support was not installed previously"
   ${EndIf}
 
   Pop $1
@@ -956,6 +934,11 @@ Section -Post
   ; Tune TcpWindowSize for a better network throughput
   WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" "TcpWindowSize" 64240
 
+!ifdef _DEBUG
+  ${LogVerbose} "Enable Backdoor logging for debug build."
+  WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Services\VBoxGuest" "LoggingEnabled" 255
+!endif
+
   ; Add Sun Ray  client info keys
   ; Note: We only need 32-bit keys (HKLM\Software / HKLM\Software\Wow6432Node)
 !if $%BUILD_TARGET_ARCH% == "amd64"
@@ -1105,7 +1088,6 @@ Function .onInit
   StrCpy $g_bNoGuestDrv "false"
   StrCpy $g_bNoMouseDrv "false"
   StrCpy $g_bWithAutoLogon "false"
-  StrCpy $g_bWithVBoxMMR "false"
   StrCpy $g_bWithD3D "false"
   StrCpy $g_bOnlyExtract "false"
   StrCpy $g_bWithWDDM "false"

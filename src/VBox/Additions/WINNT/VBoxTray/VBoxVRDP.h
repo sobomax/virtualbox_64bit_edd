@@ -1,3 +1,4 @@
+/* $Id: VBoxVRDP.h $ */
 /** @file
  * VBoxVRDP - VRDP notification
  */

@@ -1,3 +1,4 @@
+/* $Id: vboxmrxnp.cpp $ */
 /** @file
  *
  * VirtualBox Windows Guest Shared Folders

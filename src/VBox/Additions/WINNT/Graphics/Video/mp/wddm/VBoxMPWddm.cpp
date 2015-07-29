@@ -33,6 +33,9 @@
 
 #include <stdio.h>
 
+/* Uncomment this in order to enable dumping regions guest wants to display on DxgkDdiPresentNew(). */
+//#define VBOX_WDDM_DUMP_REGIONS_ON_PRESENT
+
 #define VBOXWDDM_DUMMY_DMABUFFER_SIZE (sizeof (VBOXCMDVBVA_HDR) / 2)
 
 DWORD g_VBoxLogUm = 0;
@@ -1108,7 +1111,7 @@ NTSTATUS DxgkDdiStartDevice(
                 {
                     pDevExt->fTexPresentEnabled = !!(VBoxMpCrGetHostCaps() & CR_VBOX_CAP_TEX_PRESENT);
                     pDevExt->fCmdVbvaEnabled = !!(VBoxMpCrGetHostCaps() & CR_VBOX_CAP_CMDVBVA);
-# if 0
+# if 1
                     pDevExt->fComplexTopologiesEnabled = pDevExt->fCmdVbvaEnabled;
 # else
                     pDevExt->fComplexTopologiesEnabled = FALSE;
@@ -4189,6 +4192,17 @@ static BOOLEAN vboxVddmPointerShapeToAttributes(CONST DXGKARG_SETPOINTERSHAPE* p
     return TRUE;
 }
 
+static void vboxWddmHostPointerEnable(PVBOXMP_DEVEXT pDevExt, BOOLEAN fEnable)
+{
+    VIDEO_POINTER_ATTRIBUTES PointerAttributes;
+    RT_ZERO(PointerAttributes);
+    if (fEnable)
+    {
+        PointerAttributes.Enable = VBOX_MOUSE_POINTER_VISIBLE;
+    }
+    VBoxMPCmnUpdatePointerShape(VBoxCommonFromDeviceExt(pDevExt), &PointerAttributes, sizeof(PointerAttributes));
+}
+
 NTSTATUS
 APIENTRY
 DxgkDdiSetPointerPosition(
@@ -4234,20 +4248,15 @@ DxgkDdiSetPointerPosition(
         if (fScreenChanged)
         {
             BOOLEAN bResult = VBoxMPCmnUpdatePointerShape(VBoxCommonFromDeviceExt(pDevExt), &pPointerInfo->Attributes.data, VBOXWDDM_POINTER_ATTRIBUTES_SIZE);
-            Assert(bResult);
+            if (!bResult)
+            {
+                vboxWddmHostPointerEnable(pDevExt, FALSE);
+            }
         }
         else
         {
             // tell the host to use the guest's pointer
-            VIDEO_POINTER_ATTRIBUTES PointerAttributes;
-
-            /* Visible and No Shape means Show the pointer.
-             * It is enough to init only this field.
-             */
-            PointerAttributes.Enable = pSetPointerPosition->Flags.Visible ? VBOX_MOUSE_POINTER_VISIBLE : 0;
-
-            BOOLEAN bResult = VBoxMPCmnUpdatePointerShape(VBoxCommonFromDeviceExt(pDevExt), &PointerAttributes, sizeof (PointerAttributes));
-            Assert(bResult);
+            vboxWddmHostPointerEnable(pDevExt, pSetPointerPosition->Flags.Visible);
         }
     }
 
@@ -4282,8 +4291,8 @@ DxgkDdiSetPointerShape(
                 Status = STATUS_SUCCESS;
             else
             {
-                AssertBreakpoint();
-                LOGREL(("vboxUpdatePointerShape failed"));
+                // tell the host to use the guest's pointer
+                vboxWddmHostPointerEnable(pDevExt, FALSE);
             }
         }
     }
@@ -5740,7 +5749,6 @@ DxgkDdiRenderNew(
     __try
     {
         PVBOXWDDM_DMA_PRIVATEDATA_BASEHDR pInputHdr = (PVBOXWDDM_DMA_PRIVATEDATA_BASEHDR)pRender->pCommand;
-        NTSTATUS Status = STATUS_SUCCESS;
 
         uint32_t cbBuffer = 0;
         uint32_t cbPrivateData = 0;
@@ -6164,6 +6172,16 @@ DxgkDdiPresentNew(
         return STATUS_INVALID_PARAMETER;
     }
 
+#ifdef VBOX_WDDM_DUMP_REGIONS_ON_PRESENT
+    LogRel(("%s: [%ld, %ld, %ld, %ld] -> [%ld, %ld, %ld, %ld] (SubRectCnt=%u)\n",
+        pPresent->Flags.Blt ? "Blt" : (pPresent->Flags.Flip ? "Flip" : (pPresent->Flags.ColorFill ? "ColorFill" : "Unknown OP")),
+        pPresent->SrcRect.left, pPresent->SrcRect.top, pPresent->SrcRect.right, pPresent->SrcRect.bottom,
+        pPresent->DstRect.left, pPresent->DstRect.top, pPresent->DstRect.right, pPresent->DstRect.bottom,
+        pPresent->SubRectCnt));
+    for (unsigned int i = 0; i < pPresent->SubRectCnt; i++)
+        LogRel(("\tsub#%u = [%ld, %ld, %ld, %ld]\n", i, pPresent->pDstSubRects[i].left, pPresent->pDstSubRects[i].top, pPresent->pDstSubRects[i].right, pPresent->pDstSubRects[i].bottom));
+#endif
+
     if (pPresent->Flags.Blt)
     {
         Assert(pPresent->Flags.Value == 1); /* only Blt is set, we do not support anything else for now */
@@ -6302,7 +6320,8 @@ DxgkDdiPresentNew(
         }
 
         cbBuffer = VBOXWDDM_DUMMY_DMABUFFER_SIZE;
-        cbPrivateData = sizeof (*pFlip);
+        paRects = pFlip->aRects;
+        cbPrivateData = VBOXCMDVBVA_SIZEOF_FLIPSTRUCT_MIN;
     }
     else if (pPresent->Flags.ColorFill)
     {

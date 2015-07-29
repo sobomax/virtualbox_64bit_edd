@@ -1,3 +1,4 @@
+/* $Id: VBoxSharedFolders.h $ */
 /** @file
  * VBoxSharedFolders - Handling for shared folders
  */
