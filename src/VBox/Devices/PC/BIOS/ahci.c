@@ -32,6 +32,7 @@
 /* Number of S/G table entries in EDDS. */
 #define NUM_EDDS_SG         16
 
+
 /**
  * AHCI PRDT structure.
  */
@@ -352,14 +353,14 @@ static uint16_t ahci_cmd_data(bio_dsk_t __far *bios_dsk, uint8_t cmd)
     ahci->abCmd[2]  = cmd;
     ahci->abCmd[3]  = 0;
 
-    ahci->abCmd[4]  = bios_dsk->drqp.lba64 & 0xff;
-    ahci->abCmd[5]  = (bios_dsk->drqp.lba64 >> 8) & 0xff;
-    ahci->abCmd[6]  = (bios_dsk->drqp.lba64 >> 16) & 0xff;
+    ahci->abCmd[4]  = bios_dsk->drqp.lba & 0xff;
+    ahci->abCmd[5]  = (bios_dsk->drqp.lba >> 8) & 0xff;
+    ahci->abCmd[6]  = (bios_dsk->drqp.lba >> 16) & 0xff;
     ahci->abCmd[7]  = RT_BIT_32(6); /* LBA access. */
 
-    ahci->abCmd[8]  = (bios_dsk->drqp.lba64 >> 24) & 0xff;
-    ahci->abCmd[9]  = (bios_dsk->drqp.lba64 >> 32) & 0xff;
-    ahci->abCmd[10] = (bios_dsk->drqp.lba64 >> 40) & 0xff;
+    ahci->abCmd[8]  = (bios_dsk->drqp.lba >> 24) & 0xff;
+    ahci->abCmd[9]  = (bios_dsk->drqp.lba >> 32) & 0xff;
+    ahci->abCmd[10] = (bios_dsk->drqp.lba >> 40) & 0xff;
     ahci->abCmd[11] = 0;
 
     ahci->abCmd[12] = (uint8_t)(n_sect & 0xff);
@@ -524,7 +525,7 @@ int ahci_read_sectors(bio_dsk_t __far *bios_dsk)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
     DBG_AHCI("%s: %u sectors @ LBA 0x%llx, device %d, port %d\n", __func__,
-             bios_dsk->drqp.nsect, bios_dsk->drqp.lba64,
+             bios_dsk->drqp.nsect, bios_dsk->drqp.lba,
              device_id, bios_dsk->ahcidev[device_id].port);
 
     high_bits_save(bios_dsk->ahci_seg :> 0);
@@ -556,7 +557,7 @@ int ahci_write_sectors(bio_dsk_t __far *bios_dsk)
         BX_PANIC("%s: device_id out of range %d\n", __func__, device_id);
 
     DBG_AHCI("%s: %u sectors @ LBA 0x%llx, device %d, port %d\n", __func__,
-             bios_dsk->drqp.nsect, bios_dsk->drqp.lba64, device_id,
+             bios_dsk->drqp.nsect, bios_dsk->drqp.lba, device_id,
              bios_dsk->ahcidev[device_id].port);
 
     high_bits_save(bios_dsk->ahci_seg :> 0);
@@ -600,7 +601,7 @@ uint16_t ahci_cmd_packet(uint16_t device_id, uint8_t cmdlen, char __far *cmdbuf,
     DBG_AHCI("%s: reading %u %u-byte sectors\n", __func__,
              bios_dsk->drqp.nsect, bios_dsk->drqp.sect_sz);
 
-    bios_dsk->drqp.lba64   = length << 8;     //@todo: xfer length limit
+    bios_dsk->drqp.lba     = length << 8;     //@todo: xfer length limit
     bios_dsk->drqp.buffer  = buffer;
     bios_dsk->drqp.nsect   = length / bios_dsk->drqp.sect_sz;
 //    bios_dsk->drqp.sect_sz = 2048;
@@ -696,7 +697,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 DBG_AHCI("AHCI: Detected hard disk\n");
 
                 /* Identify device. */
-                bios_dsk->drqp.lba64   = 0;
+                bios_dsk->drqp.lba     = 0;
                 bios_dsk->drqp.buffer  = &abBuffer;
                 bios_dsk->drqp.nsect   = 1;
                 bios_dsk->drqp.sect_sz = 512;
@@ -723,7 +724,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 bios_dsk->devices[hd_index].lock        = 0;
                 bios_dsk->devices[hd_index].blksize     = 512;
                 bios_dsk->devices[hd_index].translation = GEO_TRANSLATION_LBA;
-                bios_dsk->devices[hd_index].sectors64   = sectors;
+                bios_dsk->devices[hd_index].sectors     = sectors;
 
                 bios_dsk->devices[hd_index].pchs.heads     = heads;
                 bios_dsk->devices[hd_index].pchs.cylinders = cylinders;
@@ -778,7 +779,7 @@ void ahci_port_detect_device(ahci_t __far *ahci, uint8_t u8Port)
                 DBG_AHCI("AHCI: Detected ATAPI device\n");
 
                 /* Identify packet device. */
-                bios_dsk->drqp.lba64   = 0;
+                bios_dsk->drqp.lba     = 0;
                 bios_dsk->drqp.buffer  = &abBuffer;
                 bios_dsk->drqp.nsect   = 1;
                 bios_dsk->drqp.sect_sz = 512;

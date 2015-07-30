@@ -216,7 +216,7 @@ void BIOSCALL int13_harddisk(disk_regs_t r)
         bios_dsk->drqp.trsfbytes   = 0;
 
         /* Pass request information to low level disk code. */
-        bios_dsk->drqp.lba64    = lba;
+        bios_dsk->drqp.lba      = lba;
         bios_dsk->drqp.buffer   = MK_FP(ES, BX);
         bios_dsk->drqp.nsect    = count;
         bios_dsk->drqp.sect_sz  = 512;  //@todo: device specific?
@@ -394,7 +394,7 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
                           count, lba, segment, offset);
 
         type = bios_dsk->devices[device].type;
-        if (lba >= bios_dsk->devices[device].sectors64) {
+        if (lba >= bios_dsk->devices[device].sectors) {
               BX_INFO("%s: function %02x. LBA out of range\n", __func__, GET_AH());
               goto int13x_fail;
         }
@@ -408,7 +408,7 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
         bios_dsk->drqp.trsfbytes   = 0;
 
         /* Pass request information to low level disk code. */
-        bios_dsk->drqp.lba64   = lba;
+        bios_dsk->drqp.lba     = lba;
         bios_dsk->drqp.buffer  = MK_FP(segment, offset);
         bios_dsk->drqp.nsect   = count;
         bios_dsk->drqp.sect_sz = 512;   //@todo: device specific?
@@ -454,7 +454,7 @@ void BIOSCALL int13_harddisk_ext(disk_regs_t r)
             npc     = bios_dsk->devices[device].pchs.cylinders;
             nph     = bios_dsk->devices[device].pchs.heads;
             npspt   = bios_dsk->devices[device].pchs.spt;
-            lba     = bios_dsk->devices[device].sectors64;
+            lba     = bios_dsk->devices[device].sectors;
             blksize = bios_dsk->devices[device].blksize;
 
             dpt->size      = 0x1a;

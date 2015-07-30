@@ -75,7 +75,7 @@ typedef struct {
 /* READ_16/WRITE_16 CDB layout. */
 typedef struct {
     uint16_t    command;    /* Command. */
-    uint64_t    lba64;      /* LBA, MSB first! */
+    uint64_t    lba;        /* LBA, MSB first! */
     uint32_t    nsect32;    /* Sector count, MSB first! */
     uint8_t     pad1;       /* Unused. */
     uint8_t     pad2;       /* Unused. */
@@ -232,7 +232,7 @@ int scsi_read_sectors(bio_dsk_t __far *bios_dsk)
 
     /* Prepare a CDB. */
     cdb.command = SCSI_READ_16;
-    cdb.lba64   = swap_64(bios_dsk->drqp.lba64);
+    cdb.lba     = swap_64(bios_dsk->drqp.lba);
     cdb.pad1    = 0;
     cdb.nsect32 = swap_32(count);
     cdb.pad2    = 0;
@@ -281,7 +281,7 @@ int scsi_write_sectors(bio_dsk_t __far *bios_dsk)
 
     /* Prepare a CDB. */
     cdb.command = SCSI_WRITE_16;
-    cdb.lba64   = swap_64(bios_dsk->drqp.lba64);
+    cdb.lba     = swap_64(bios_dsk->drqp.lba);
     cdb.pad1    = 0;
     cdb.nsect32 = swap_32(count);
     cdb.pad2    = 0;
@@ -567,7 +567,7 @@ void scsi_enumerate_attached_devices(uint16_t io_base)
                 BX_INFO("SCSI %d-ID#%d: LCHS=%lu/%u/%u 0x%llx sectors\n", devcount_scsi,
                         i, (uint32_t)cylinders, heads, sectors_per_track, sectors);
 
-                bios_dsk->devices[hd_index].sectors64 = sectors;
+                bios_dsk->devices[hd_index].sectors = sectors;
 
                 /* Store the id of the disk in the ata hdidmap. */
                 hdcount = bios_dsk->hdcount;
