@@ -108,7 +108,7 @@ void BIOSCALL ata_init(void)
         bios_dsk->devices[device].pchs.heads     = 0;
         bios_dsk->devices[device].pchs.cylinders = 0;
         bios_dsk->devices[device].pchs.spt       = 0;
-        bios_dsk->devices[device].sectors64      = 0;
+        bios_dsk->devices[device].sectors        = 0;
     }
 
     // hdidmap  and cdidmap init.
@@ -245,7 +245,7 @@ uint16_t ata_cmd_data_in(bio_dsk_t __far *bios_dsk, uint16_t command, uint16_t c
         return 1;
     }
 
-    lba      = bios_dsk->drqp.lba64;
+    lba      = bios_dsk->drqp.lba;
     buffer   = bios_dsk->drqp.buffer;
     sector   = bios_dsk->drqp.sector;
     cylinder = bios_dsk->drqp.cylinder;
@@ -521,7 +521,7 @@ void BIOSCALL ata_detect(void)
             bios_dsk->devices[device].pchs.heads     = heads;
             bios_dsk->devices[device].pchs.cylinders = cylinders;
             bios_dsk->devices[device].pchs.spt       = spt;
-            bios_dsk->devices[device].sectors64      = sectors;
+            bios_dsk->devices[device].sectors        = sectors;
             bios_dsk->devices[device].lchs           = lgeo;
             if (device < 2)
             {
@@ -593,7 +593,7 @@ void BIOSCALL ata_detect(void)
 
             switch (type) {
             case DSK_TYPE_ATA:
-                sizeinmb = (bios_dsk->devices[device].sectors64 >> 11);
+                sizeinmb = (bios_dsk->devices[device].sectors >> 11);
             case DSK_TYPE_ATAPI:
                 // Read ATA/ATAPI version
                 ataversion = ((uint16_t)(*(buffer+161))<<8) | *(buffer+160);
@@ -711,7 +711,7 @@ uint16_t ata_cmd_data_out(bio_dsk_t __far *bios_dsk, uint16_t command, uint16_t 
         return 1;
     }
 
-    lba      = bios_dsk->drqp.lba64;
+    lba      = bios_dsk->drqp.lba;
     buffer   = bios_dsk->drqp.buffer;
     sector   = bios_dsk->drqp.sector;
     cylinder = bios_dsk->drqp.cylinder;
@@ -839,7 +839,7 @@ int ata_read_sectors(bio_dsk_t __far *bios_dsk)
         bios_dsk->devices[device_id].blksize = 0x200;
     } else {
         /* LBA addressing. */
-        if (bios_dsk->drqp.lba64 + n_sect >= 268435456) {
+        if (bios_dsk->drqp.lba + n_sect >= 268435456) {
             BX_DEBUG_ATA("%s: reading %u sector (LBA,EXT)\n", __func__, n_sect);
             status = ata_cmd_data_in(bios_dsk, ATA_CMD_READ_SECTORS_EXT, n_sect);
         } else {
@@ -870,7 +870,7 @@ int ata_write_sectors(bio_dsk_t __far *bios_dsk)
         return ata_cmd_data_out(bios_dsk, ATA_CMD_WRITE_SECTORS, n_sect);
     } else {
         /* LBA addressing. */
-        if (bios_dsk->drqp.lba64 + n_sect >= 268435456)
+        if (bios_dsk->drqp.lba + n_sect >= 268435456)
             return ata_cmd_data_out(bios_dsk, ATA_CMD_WRITE_SECTORS_EXT, n_sect);
         else
             return ata_cmd_data_out(bios_dsk, ATA_CMD_WRITE_SECTORS, n_sect);
