@@ -824,74 +824,6 @@
 ;  
 
 ;
-; Source file: u8rs086.asm
-;
-;  *****************************************************************************
-;  *
-;  *                            Open Watcom Project
-;  *
-;  *    Portions Copyright (c) 1983-2002 Sybase, Inc. All Rights Reserved.
-;  *
-;  *  ========================================================================
-;  *
-;  *    This file contains Original Code and/or Modifications of Original
-;  *    Code as defined in and that are subject to the Sybase Open Watcom
-;  *    Public License version 1.0 (the 'License'). You may not use this file
-;  *    except in compliance with the License. BY USING THIS FILE YOU AGREE TO
-;  *    ALL TERMS AND CONDITIONS OF THE LICENSE. A copy of the License is
-;  *    provided with the Original Code and Modifications, and is also
-;  *    available at www.sybase.com/developer/opensource.
-;  *
-;  *    The Original Code and all software distributed under the License are
-;  *    distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
-;  *    EXPRESS OR IMPLIED, AND SYBASE AND ALL CONTRIBUTORS HEREBY DISCLAIM
-;  *    ALL SUCH WARRANTIES, INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF
-;  *    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR
-;  *    NON-INFRINGEMENT. Please see the License for the specific language
-;  *    governing rights and limitations under the License.
-;  *
-;  *  ========================================================================
-;  *
-;  * Description:  WHEN YOU FIGURE OUT WHAT THIS FILE DOES, PLEASE
-;  *               DESCRIBE IT HERE!
-;  *
-;  *****************************************************************************
-
-;
-; Source file: i8ls086.asm
-;
-;  *****************************************************************************
-;  *
-;  *                            Open Watcom Project
-;  *
-;  *    Portions Copyright (c) 1983-2002 Sybase, Inc. All Rights Reserved.
-;  *
-;  *  ========================================================================
-;  *
-;  *    This file contains Original Code and/or Modifications of Original
-;  *    Code as defined in and that are subject to the Sybase Open Watcom
-;  *    Public License version 1.0 (the 'License'). You may not use this file
-;  *    except in compliance with the License. BY USING THIS FILE YOU AGREE TO
-;  *    ALL TERMS AND CONDITIONS OF THE LICENSE. A copy of the License is
-;  *    provided with the Original Code and Modifications, and is also
-;  *    available at www.sybase.com/developer/opensource.
-;  *
-;  *    The Original Code and all software distributed under the License are
-;  *    distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
-;  *    EXPRESS OR IMPLIED, AND SYBASE AND ALL CONTRIBUTORS HEREBY DISCLAIM
-;  *    ALL SUCH WARRANTIES, INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF
-;  *    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR
-;  *    NON-INFRINGEMENT. Please see the License for the specific language
-;  *    governing rights and limitations under the License.
-;  *
-;  *  ========================================================================
-;  *
-;  * Description:  WHEN YOU FIGURE OUT WHAT THIS FILE DOES, PLEASE
-;  *               DESCRIBE IT HERE!
-;  *
-;  *****************************************************************************
-
-;
 ; Source file: pci32.c
 ;
 ;  $Id: pci32.c $
@@ -1125,7 +1057,7 @@ _panic_msg_keyb_buffer_full:                 ; 0xf116c LB 0x20
   ; Padding 0x474 bytes at 0xf118c
   times 1140 db 0
 
-section _TEXT progbits vstart=0x1600 align=1 ; size=0x87a0 class=CODE group=AUTO
+section _TEXT progbits vstart=0x1600 align=1 ; size=0x8796 class=CODE group=AUTO
 rom_scan_:                                   ; 0xf1600 LB 0x50
     push bp                                   ; 55
     mov bp, sp                                ; 89 e5
@@ -1748,7 +1680,7 @@ bios_printf_:                                ; 0xf1972 LB 0x33d
     mov cx, word [bp-024h]                    ; 8b 4e dc
     mov dx, word [bp-026h]                    ; 8b 56 da
     mov si, word [bp-01eh]                    ; 8b 76 e2
-    call 09d80h                               ; e8 75 82
+    call 09d86h                               ; e8 7b 82
     mov ax, dx                                ; 89 d0
     xor ah, dh                                ; 30 f4
     and AL, strict byte 00fh                  ; 24 0f
@@ -2193,7 +2125,7 @@ ata_cmd_data_in_:                            ; 0xf1e5a LB 0x2e7
     mov cx, word [bp-012h]                    ; 8b 4e ee
     mov dx, di                                ; 89 fa
     mov si, strict word 00018h                ; be 18 00
-    call 09d80h                               ; e8 11 7e
+    call 09d86h                               ; e8 17 7e
     xor dh, dh                                ; 30 f6
     mov word [bp-01ah], dx                    ; 89 56 e6
     mov ax, word [bp-010h]                    ; 8b 46 f0
@@ -2201,7 +2133,7 @@ ata_cmd_data_in_:                            ; 0xf1e5a LB 0x2e7
     mov cx, word [bp-012h]                    ; 8b 4e ee
     mov dx, di                                ; 89 fa
     mov si, strict word 00020h                ; be 20 00
-    call 09d80h                               ; e8 fb 7d
+    call 09d86h                               ; e8 01 7e
     mov bx, dx                                ; 89 d3
     mov ax, word [bp-026h]                    ; 8b 46 da
     xor al, al                                ; 30 c0
@@ -2235,13 +2167,13 @@ ata_cmd_data_in_:                            ; 0xf1e5a LB 0x2e7
     mov cx, word [bp-012h]                    ; 8b 4e ee
     mov dx, di                                ; 89 fa
     mov si, strict word 00008h                ; be 08 00
-    call 09d80h                               ; e8 a9 7d
+    call 09d86h                               ; e8 af 7d
     mov word [bp-010h], ax                    ; 89 46 f0
     mov word [bp-014h], bx                    ; 89 5e ec
     mov word [bp-012h], cx                    ; 89 4e ee
     mov word [bp-01ch], dx                    ; 89 56 e4
     mov si, strict word 00010h                ; be 10 00
-    call 09d80h                               ; e8 97 7d
+    call 09d86h                               ; e8 9d 7d
     mov di, dx                                ; 89 d7
     and di, strict byte 0000fh                ; 83 e7 0f
     or di, strict byte 00040h                 ; 83 cf 40
@@ -2803,7 +2735,7 @@ _ata_detect:                                 ; 0xf2141 LB 0x65c
     mov cx, word [es:si+038h]                 ; 26 8b 4c 38
     mov dx, word [es:si+036h]                 ; 26 8b 54 36
     mov si, strict word 0000bh                ; be 0b 00
-    call 09d80h                               ; e8 bd 77
+    call 09d86h                               ; e8 c3 77
     mov word [bp-030h], dx                    ; 89 56 d0
     mov word [bp-02eh], cx                    ; 89 4e d2
     movzx ax, byte [bp-001c3h]                ; 0f b6 86 3d fe
@@ -3074,7 +3006,7 @@ ata_cmd_data_out_:                           ; 0xf279d LB 0x2bc
     mov cx, word [bp-016h]                    ; 8b 4e ea
     mov dx, word [bp-01eh]                    ; 8b 56 e2
     mov si, strict word 00018h                ; be 18 00
-    call 09d80h                               ; e8 e7 74
+    call 09d86h                               ; e8 ed 74
     xor dh, dh                                ; 30 f6
     mov word [bp-01ch], dx                    ; 89 56 e4
     mov ax, word [bp-010h]                    ; 8b 46 f0
@@ -3082,7 +3014,7 @@ ata_cmd_data_out_:                           ; 0xf279d LB 0x2bc
     mov cx, word [bp-016h]                    ; 8b 4e ea
     mov dx, word [bp-01eh]                    ; 8b 56 e2
     mov si, strict word 00020h                ; be 20 00
-    call 09d80h                               ; e8 d0 74
+    call 09d86h                               ; e8 d6 74
     mov bx, dx                                ; 89 d3
     mov ax, word [bp-01ah]                    ; 8b 46 e6
     xor al, al                                ; 30 c0
@@ -3116,14 +3048,14 @@ ata_cmd_data_out_:                           ; 0xf279d LB 0x2bc
     mov cx, word [bp-016h]                    ; 8b 4e ea
     mov dx, word [bp-01eh]                    ; 8b 56 e2
     mov si, strict word 00008h                ; be 08 00
-    call 09d80h                               ; e8 7c 74
+    call 09d86h                               ; e8 82 74
     mov word [bp-010h], ax                    ; 89 46 f0
     mov word [bp-014h], bx                    ; 89 5e ec
     mov word [bp-016h], cx                    ; 89 4e ea
     mov word [bp-01eh], dx                    ; 89 56 e2
     mov word [bp-026h], dx                    ; 89 56 da
     mov si, strict word 00010h                ; be 10 00
-    call 09d80h                               ; e8 67 74
+    call 09d86h                               ; e8 6d 74
     mov word [bp-01eh], dx                    ; 89 56 e2
     mov ax, dx                                ; 89 d0
     xor ah, dh                                ; 30 f4
@@ -7924,7 +7856,7 @@ set_geom_lba_:                               ; 0xf5890 LB 0xe5
     mov cx, word [bp+00eh]                    ; 8b 4e 0e
     mov dx, word [bp+00ch]                    ; 8b 56 0c
     mov si, strict word 00020h                ; be 20 00
-    call 09d80h                               ; e8 c5 44
+    call 09d86h                               ; e8 cb 44
     test ax, ax                               ; 85 c0
     jne short 058cbh                          ; 75 0c
     test bx, bx                               ; 85 db
@@ -8509,7 +8441,7 @@ _int13_harddisk_ext:                         ; 0xf5dbf LB 0x4f4
     xor ax, ax                                ; 31 c0
     xor bx, bx                                ; 31 db
     mov si, strict word 00020h                ; be 20 00
-    call 09d90h                               ; e8 e8 3e
+    call 09d76h                               ; e8 ce 3e
     mov word [bp-00eh], bx                    ; 89 5e f2
     mov bx, word [es:di+008h]                 ; 26 8b 5d 08
     mov di, word [es:di+00ah]                 ; 26 8b 7d 0a
@@ -8660,7 +8592,7 @@ _int13_harddisk_ext:                         ; 0xf5dbf LB 0x4f4
     mov word [es:bx+012h], cx                 ; 26 89 4f 12
     mov bx, word [bp-00eh]                    ; 8b 5e f2
     mov si, strict word 00020h                ; be 20 00
-    call 09d80h                               ; e8 fe 3c
+    call 09d86h                               ; e8 04 3d
     mov bx, di                                ; 89 fb
     mov word [es:bx+014h], dx                 ; 26 89 57 14
     mov word [es:bx+016h], cx                 ; 26 89 4f 16
@@ -11630,7 +11562,7 @@ swap_64_:                                    ; 0xf7d6d LB 0x63
     xor bx, bx                                ; 31 db
     mov dx, di                                ; 89 fa
     mov si, strict word 00020h                ; be 20 00
-    call 09d90h                               ; e8 fe 1f
+    call 09d76h                               ; e8 e4 1f
     mov word [bp-008h], ax                    ; 89 46 f8
     mov di, bx                                ; 89 df
     mov word [bp-00ah], cx                    ; 89 4e f6
@@ -11640,7 +11572,7 @@ swap_64_:                                    ; 0xf7d6d LB 0x63
     mov cx, word [bp-010h]                    ; 8b 4e f0
     mov dx, word [bp-012h]                    ; 8b 56 ee
     mov si, strict word 00020h                ; be 20 00
-    call 09d80h                               ; e8 d1 1f
+    call 09d86h                               ; e8 d7 1f
     mov ax, dx                                ; 89 d0
     mov dx, cx                                ; 89 ca
     xchg ah, al                               ; 86 c4
@@ -12103,7 +12035,7 @@ scsi_enumerate_attached_devices_:            ; 0xf80e2 LB 0x47a
     mov cx, word [bp-012h]                    ; 8b 4e ee
     mov dx, word [bp-016h]                    ; 8b 56 ea
     mov si, strict word 0000ch                ; be 0c 00
-    call 09d80h                               ; e8 2c 1b
+    call 09d86h                               ; e8 32 1b
     mov word [bp-018h], ax                    ; 89 46 e8
     mov word [bp-014h], bx                    ; 89 5e ec
     mov word [bp-036h], cx                    ; 89 4e ca
@@ -12123,7 +12055,7 @@ scsi_enumerate_attached_devices_:            ; 0xf80e2 LB 0x47a
     mov cx, word [bp-012h]                    ; 8b 4e ee
     mov dx, word [bp-016h]                    ; 8b 56 ea
     mov si, strict word 00006h                ; be 06 00
-    call 09d80h                               ; e8 ec 1a
+    call 09d86h                               ; e8 f2 1a
     mov si, word [bp-020h]                    ; 8b 76 e0
     add si, dx                                ; 01 d6
     mov word [bp-02ah], si                    ; 89 76 d6
@@ -12141,7 +12073,7 @@ scsi_enumerate_attached_devices_:            ; 0xf80e2 LB 0x47a
     mov cx, word [bp-028h]                    ; 8b 4e d8
     mov dx, si                                ; 89 f2
     mov si, strict word 00008h                ; be 08 00
-    call 09d80h                               ; e8 bc 1a
+    call 09d86h                               ; e8 c2 1a
     mov word [bp-022h], bx                    ; 89 5e de
     mov word [bp-02ch], cx                    ; 89 4e d4
     mov word [bp-01ah], dx                    ; 89 56 e6
@@ -12150,7 +12082,7 @@ scsi_enumerate_attached_devices_:            ; 0xf80e2 LB 0x47a
     mov cx, word [bp-028h]                    ; 8b 4e d8
     mov dx, word [bp-02ah]                    ; 8b 56 d6
     mov si, strict word 00010h                ; be 10 00
-    call 09d80h                               ; e8 a1 1a
+    call 09d86h                               ; e8 a7 1a
     mov si, word [bp-01ah]                    ; 8b 76 e6
     add si, dx                                ; 01 d6
     mov dx, word [bp-02ch]                    ; 8b 56 d4
@@ -12174,7 +12106,7 @@ scsi_enumerate_attached_devices_:            ; 0xf80e2 LB 0x47a
     mov cx, word [bp-012h]                    ; 8b 4e ee
     mov dx, word [bp-016h]                    ; 8b 56 ea
     mov si, strict word 0000bh                ; be 0b 00
-    call 09d80h                               ; e8 59 1a
+    call 09d86h                               ; e8 5f 1a
     mov si, dx                                ; 89 d6
     mov dx, cx                                ; 89 ca
     mov al, byte [bp-00ch]                    ; 8a 46 f4
@@ -12706,7 +12638,7 @@ ahci_cmd_data_:                              ; 0xf87c1 LB 0x25a
     mov cx, word [es:di+002h]                 ; 26 8b 4d 02
     mov dx, word [es:di]                      ; 26 8b 15
     mov si, strict word 00008h                ; be 08 00
-    call 09d80h                               ; e8 3a 15
+    call 09d86h                               ; e8 40 15
     mov es, [bp-014h]                         ; 8e 46 ec
     mov bx, word [bp-00ch]                    ; 8b 5e f4
     mov byte [es:bx+00085h], dl               ; 26 88 97 85 00
@@ -12716,7 +12648,7 @@ ahci_cmd_data_:                              ; 0xf87c1 LB 0x25a
     mov cx, word [es:di+002h]                 ; 26 8b 4d 02
     mov dx, word [es:di]                      ; 26 8b 15
     mov si, strict word 00010h                ; be 10 00
-    call 09d80h                               ; e8 17 15
+    call 09d86h                               ; e8 1d 15
     mov es, [bp-014h]                         ; 8e 46 ec
     mov bx, word [bp-00ch]                    ; 8b 5e f4
     mov byte [es:bx+00086h], dl               ; 26 88 97 86 00
@@ -12727,7 +12659,7 @@ ahci_cmd_data_:                              ; 0xf87c1 LB 0x25a
     mov cx, word [es:di+002h]                 ; 26 8b 4d 02
     mov dx, word [es:di]                      ; 26 8b 15
     mov si, strict word 00018h                ; be 18 00
-    call 09d80h                               ; e8 ee 14
+    call 09d86h                               ; e8 f4 14
     mov es, [bp-014h]                         ; 8e 46 ec
     mov bx, word [bp-00ch]                    ; 8b 5e f4
     mov byte [es:bx+00088h], dl               ; 26 88 97 88 00
@@ -12737,7 +12669,7 @@ ahci_cmd_data_:                              ; 0xf87c1 LB 0x25a
     mov cx, word [es:di+002h]                 ; 26 8b 4d 02
     mov dx, word [es:di]                      ; 26 8b 15
     mov si, strict word 00020h                ; be 20 00
-    call 09d80h                               ; e8 cb 14
+    call 09d86h                               ; e8 d1 14
     mov es, [bp-014h]                         ; 8e 46 ec
     mov bx, word [bp-00ch]                    ; 8b 5e f4
     mov byte [es:bx+00089h], dl               ; 26 88 97 89 00
@@ -12747,7 +12679,7 @@ ahci_cmd_data_:                              ; 0xf87c1 LB 0x25a
     mov cx, word [es:di+002h]                 ; 26 8b 4d 02
     mov dx, word [es:di]                      ; 26 8b 15
     mov si, strict word 00028h                ; be 28 00
-    call 09d80h                               ; e8 a8 14
+    call 09d86h                               ; e8 ae 14
     mov es, [bp-014h]                         ; 8e 46 ec
     mov bx, word [bp-00ch]                    ; 8b 5e f4
     mov byte [es:bx+0008ah], dl               ; 26 88 97 8a 00
@@ -14872,7 +14804,7 @@ apm_worker:                                  ; 0xf9d2a LB 0x3a
     mov AH, strict byte 009h                  ; b4 09
     stc                                       ; f9
     retn                                      ; c3
-apm_pm16_entry:                              ; 0xf9d64 LB 0x1c
+apm_pm16_entry:                              ; 0xf9d64 LB 0x12
     mov AH, strict byte 002h                  ; b4 02
     push DS                                   ; 1e
     push bp                                   ; 55
@@ -14884,30 +14816,30 @@ apm_pm16_entry:                              ; 0xf9d64 LB 0x1c
     pop bp                                    ; 5d
     pop DS                                    ; 1f
     retf                                      ; cb
-    times 0xb db 0
-__U8RS:                                      ; 0xf9d80 LB 0x10
+    times 0x1 db 0
+__U8LS:                                      ; 0xf9d76 LB 0x10
     test si, si                               ; 85 f6
-    je short 09d8fh                           ; 74 0b
-    shr ax, 1                                 ; d1 e8
-    rcr bx, 1                                 ; d1 db
-    rcr cx, 1                                 ; d1 d9
-    rcr dx, 1                                 ; d1 da
-    dec si                                    ; 4e
-    jne short 09d84h                          ; 75 f5
-    retn                                      ; c3
-__I8LS:                                      ; 0xf9d90 LB 0x10
-    test si, si                               ; 85 f6
-    je short 09d9fh                           ; 74 0b
+    je short 09d85h                           ; 74 0b
     sal dx, 1                                 ; d1 e2
     rcl cx, 1                                 ; d1 d1
     rcl bx, 1                                 ; d1 d3
     rcl ax, 1                                 ; d1 d0
     dec si                                    ; 4e
-    jne short 09d94h                          ; 75 f5
+    jne short 09d7ah                          ; 75 f5
+    retn                                      ; c3
+__U8RS:                                      ; 0xf9d86 LB 0x10
+    test si, si                               ; 85 f6
+    je short 09d95h                           ; 74 0b
+    shr ax, 1                                 ; d1 e8
+    rcr bx, 1                                 ; d1 db
+    rcr cx, 1                                 ; d1 d9
+    rcr dx, 1                                 ; d1 da
+    dec si                                    ; 4e
+    jne short 09d8ah                          ; 75 f5
     retn                                      ; c3
 
-  ; Padding 0x3c60 bytes at 0xf9da0
-  times 15456 db 0
+  ; Padding 0x3c6a bytes at 0xf9d96
+  times 15466 db 0
 
 section BIOS32 progbits vstart=0xda00 align=1 ; size=0x3cb class=CODE group=AUTO
 bios32_service:                              ; 0xfda00 LB 0x26
@@ -16915,4 +16847,4 @@ dummy_iret:                                  ; 0xfff53 LB 0x9d
     db  'XM'
 cpu_reset:                                   ; 0xffff0 LB 0x10
     jmp far 0f000h:0e05bh                     ; ea 5b e0 00 f0
-    db  030h, 036h, 02fh, 032h, 033h, 02fh, 039h, 039h, 000h, 0fch, 02bh
+    db  030h, 036h, 02fh, 032h, 033h, 02fh, 039h, 039h, 000h, 0fch, 0d3h
