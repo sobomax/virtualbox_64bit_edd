@@ -106,8 +106,7 @@ int scsi_cmd_data_in(uint16_t io_base, uint8_t target_id, uint8_t __far *aCDB,
         status = inb(io_base + VBSCSI_REGISTER_STATUS);
     while (status & VBSCSI_BUSY);
 
-
-    sizes = ((length >> 12) & 0xF0) | (cbCDB >> 1);
+    sizes = ((length >> 12) & 0xF0) | (cbCDB == 16) ? 0 : cbCDB;
     outb(io_base + VBSCSI_REGISTER_COMMAND, target_id);                 /* Write the target ID. */
     outb(io_base + VBSCSI_REGISTER_COMMAND, SCSI_TXDIR_FROM_DEVICE);    /* Write the transfer direction. */
     outb(io_base + VBSCSI_REGISTER_COMMAND, sizes);                     /* Write CDB size and top bufsize bits. */
