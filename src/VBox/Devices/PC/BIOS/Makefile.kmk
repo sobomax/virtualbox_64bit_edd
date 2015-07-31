@@ -68,8 +68,7 @@ ifdef VBOX_WITH_OPEN_WATCOM
  	apm_pm.asm \
  	$(VBoxPcBios32_1_TARGET) \
  	orgs.asm \
-	u8rs086.asm \
-	i8ls086.asm
+	ow_glue64.asm
 
  # For 32-bit C code in PC BIOS.
  LIBRARIES += VBoxPcBios32
